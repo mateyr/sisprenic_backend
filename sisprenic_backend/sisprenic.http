@@ -1,0 +1,6 @@
+@sisprenic_HostAddress = http://localhost:5162
+
+GET {{sisprenic_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
