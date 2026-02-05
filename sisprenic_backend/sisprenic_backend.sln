@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sisprenic_backend", "sisprenic_backend.csproj", "{04D1B5EF-59E3-19DD-D46F-D1D91A633DCB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{04D1B5EF-59E3-19DD-D46F-D1D91A633DCB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04D1B5EF-59E3-19DD-D46F-D1D91A633DCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04D1B5EF-59E3-19DD-D46F-D1D91A633DCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04D1B5EF-59E3-19DD-D46F-D1D91A633DCB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4989CB1D-E041-4D4D-9951-18A4BC62577B}
+	EndGlobalSection
+EndGlobal

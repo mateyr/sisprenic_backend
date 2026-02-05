@@ -1,14 +1,15 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-
+using sisprenic.Configurations;
 using sisprenic.Entities;
 
 namespace sisprenic.Database
 {
-    public class SisprenicContext(DbContextOptions<SisprenicContext> options) : IdentityDbContext<IdentityUser>(options)
+    public class SisprenicContext(DbContextOptions<SisprenicContext> options)
+        : IdentityDbContext<IdentityUser>(options)
     {
-        public DbSet<Post> Posts { get; set; }
+        public DbSet<Client> Client { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -21,6 +22,9 @@ namespace sisprenic.Database
             modelBuilder.Entity<IdentityRoleClaim<string>>().ToTable("role_claim");
             modelBuilder.Entity<IdentityUserToken<string>>().ToTable("user_token");
             modelBuilder.Entity<IdentityUserLogin<string>>().ToTable("user_login");
+
+            // Invoke Configurations
+            new ClientConfiguration().Configure(modelBuilder.Entity<Client>());
         }
     }
 }

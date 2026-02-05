@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using sisprenic.Database;
@@ -11,9 +12,11 @@ using sisprenic.Database;
 namespace sisprenic.Database.Migrations
 {
     [DbContext(typeof(SisprenicContext))]
-    partial class SisprenicContextModelSnapshot : ModelSnapshot
+    [Migration("20260205165055_AddFluentAPI")]
+    partial class AddFluentAPI
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

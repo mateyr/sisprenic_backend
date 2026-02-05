@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 using sisprenic.Database;
 using sisprenic.Extensions;
@@ -20,6 +19,11 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 app.MapIdentityApi<IdentityUser>().WithTags("Authentication");
+
+// Map application endpoints
+app.MapEndpoints();
+
+await app.MigrateDbAsync();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

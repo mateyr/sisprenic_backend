@@ -1,4 +1,8 @@
-﻿namespace Web.Api.Extensions;
+﻿using Microsoft.EntityFrameworkCore;
+using sisprenic_backend.Endpoints.clients;
+using sisprenic.Database;
+
+namespace Web.Api.Extensions;
 
 public static class ApplicationBuilderExtensions
 {
@@ -13,5 +17,16 @@ public static class ApplicationBuilderExtensions
 
         return app;
     }
-}
 
+    public static async Task MigrateDbAsync(this WebApplication app)
+    {
+        using var scope = app.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<SisprenicContext>();
+        await dbContext.Database.MigrateAsync();
+    }
+
+    public static void MapEndpoints(this WebApplication app)
+    {
+        app.MapClientEndpoints().WithTags("Clients");
+    }
+}
