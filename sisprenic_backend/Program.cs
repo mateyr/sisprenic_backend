@@ -1,7 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 
 using sisprenic.Database;
 using sisprenic.Extensions;
+
+using sisprenic_backend.Authorization;
 
 using Web.Api.Extensions;
 
@@ -9,9 +12,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDatabase(builder.Configuration);
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization()
+        .AddSingleton<IAuthorizationPolicyProvider, AuthorizationPolicyProvider>();
+
 
 builder.Services.AddIdentityApiEndpoints<IdentityUser>()
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<SisprenicContext>();
 
 builder.Services.AddEndpointsApiExplorer();
