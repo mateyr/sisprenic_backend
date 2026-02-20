@@ -10,6 +10,7 @@ namespace sisprenic.Database
         : IdentityDbContext<IdentityUser>(options)
     {
         public DbSet<Client> Client { get; set; }
+        public DbSet<Menu> Menu { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -25,6 +26,7 @@ namespace sisprenic.Database
 
             // Invoke Configurations
             new ClientConfiguration().Configure(modelBuilder.Entity<Client>());
+            new MenuConfiguration().Configure(modelBuilder.Entity<Menu>());
         }
     }
 }

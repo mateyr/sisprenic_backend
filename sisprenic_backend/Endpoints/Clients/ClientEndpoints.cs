@@ -1,6 +1,6 @@
-﻿using static sisprenic_backend.Endpoints.clients.ClientTypedResults;
+﻿using static sisprenic_backend.Endpoints.Clients.ClientTypedResults;
 
-namespace sisprenic_backend.Endpoints.clients
+namespace sisprenic_backend.Endpoints.Clients
 {
     public static class ClientEndpoints
     {
@@ -8,7 +8,7 @@ namespace sisprenic_backend.Endpoints.clients
         {
             var route = app.MapGroup("/clients");
 
-            route.MapGet("/", GetAllClients).RequireAuthorization("client:read");
+            route.MapGet("/", GetAllClients).RequireAuthorization("clients:read");
             route.MapGet("/{id}", GetClient);
             route.MapPost("/", CreateClient);
             route.MapPut("/{id}", UpdateClient);

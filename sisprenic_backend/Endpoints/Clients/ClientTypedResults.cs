@@ -3,7 +3,7 @@ using sisprenic_backend.Dtos.Clients;
 using sisprenic.Database;
 using sisprenic.Entities;
 
-namespace sisprenic_backend.Endpoints.clients;
+namespace sisprenic_backend.Endpoints.Clients;
 
 public static class ClientTypedResults
 {
