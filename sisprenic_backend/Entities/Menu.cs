@@ -12,12 +12,13 @@ public class Menu
 
     public string? Section { get; set; }
 
+    public int Order { get; set; }
+
     public string? RequiredClaim { get; set; }
 
     public int? ParentMenuId { get; set; }
+
     public Menu? ParentMenu { get; set; }
 
-    public List<Menu> SubMenus { get; set; } = new();
-
-    public int Order { get; set; }
+    public List<Menu> SubMenus { get; } = new();
 }

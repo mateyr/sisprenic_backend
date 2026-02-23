@@ -37,7 +37,7 @@ public static class ClientTypedResults
     {
         Client? client = await dbContext.Client.FindAsync(id);
         if (client is null)
-            return Results.NotFound();
+            return TypedResults.NotFound();
 
         dbContext.Entry(client).CurrentValues.SetValues(updateClient);
         await dbContext.SaveChangesAsync();
