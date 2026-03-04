@@ -10,6 +10,10 @@ using Web.Api.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+string[]? allowedOrigins = builder.Configuration
+    .GetSection("AllowedOrigins")
+    .Get<string[]>() ?? Array.Empty<string>();
+
 builder.Services.AddDatabase(builder.Configuration);
 
 builder.Services.AddAuthorization()
@@ -28,7 +32,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowOrigins",
                           policy =>
                           {
-                              policy.WithOrigins("http://localhost:5173")
+                              policy.WithOrigins(allowedOrigins)
                                                   .AllowAnyHeader()
                                                   .AllowAnyMethod()
                                                   .AllowCredentials();

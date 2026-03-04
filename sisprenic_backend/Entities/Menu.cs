@@ -9,10 +9,11 @@ public class Menu
     public required string Route { get; set; }
 
     public string? Icon { get; set; }
+    public int Order { get; set; }
 
     public string? Section { get; set; }
 
-    public int Order { get; set; }
+    public int SectionOrder { get; set; }
 
     public string? RequiredClaim { get; set; }
 

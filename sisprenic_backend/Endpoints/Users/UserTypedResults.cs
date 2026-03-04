@@ -28,7 +28,7 @@ namespace sisprenic_backend.Endpoints.Users
 
             List<Menu> flatMenu = await db.Menu
                 .Where(menu => permissions.Contains(menu.RequiredClaim))
-                .OrderBy(menu => menu.Section)
+                .OrderBy(menu => menu.SectionOrder)
                 .ThenBy(menu => menu.Order)
                 .AsNoTracking()
                 .ToListAsync();
