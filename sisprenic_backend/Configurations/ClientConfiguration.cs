@@ -26,6 +26,10 @@ namespace sisprenic.Configurations
 
             // Unique constraint for identification
             builder.HasIndex(c => c.Identification).IsUnique();
+
+            builder.HasMany(c => c.Loans)
+                .WithOne(c => c.Client)
+                .HasForeignKey(c => c.ClientId);
         }
     }
 }

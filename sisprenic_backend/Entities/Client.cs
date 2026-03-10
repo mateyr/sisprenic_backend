@@ -1,4 +1,6 @@
-﻿namespace sisprenic.Entities
+﻿using sisprenic_backend.Entities;
+
+namespace sisprenic.Entities
 {
     public class Client
     {
@@ -9,5 +11,7 @@
         public string? SecondLastName { get; set; }
         public required string Identification { get; set; }
         public required string PhoneNumber { get; set; }
+
+        public ICollection<Loan> Loans { get; } = new List<Loan>();
     }
 }

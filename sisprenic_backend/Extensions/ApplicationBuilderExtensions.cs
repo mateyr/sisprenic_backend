@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 using sisprenic.Database;
 
 using sisprenic_backend.Endpoints.Auth;
 using sisprenic_backend.Endpoints.Clients;
+using sisprenic_backend.Endpoints.Loans;
 using sisprenic_backend.Endpoints.Users;
 
 namespace Web.Api.Extensions;
@@ -31,8 +32,9 @@ public static class ApplicationBuilderExtensions
 
     public static void MapEndpoints(this WebApplication app)
     {
-        app.MapClientEndpoints().WithTags("Clients");
         app.MapUserEndpoints().WithTags("Users");
+        app.MapClientEndpoints().WithTags("Clients");
+        app.MapLoanEndpoints().WithTags("Loans");
         app.MapAuthEndpoints();
     }
 }

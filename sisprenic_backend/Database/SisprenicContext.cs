@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using sisprenic.Configurations;
 using sisprenic.Entities;
+using sisprenic_backend.Configurations;
+using sisprenic_backend.Entities;
 
 namespace sisprenic.Database
 {
@@ -11,6 +13,7 @@ namespace sisprenic.Database
     {
         public DbSet<Client> Client { get; set; }
         public DbSet<Menu> Menu { get; set; }
+        public DbSet<Loan> Loan { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -27,6 +30,7 @@ namespace sisprenic.Database
             // Invoke Configurations
             new ClientConfiguration().Configure(modelBuilder.Entity<Client>());
             new MenuConfiguration().Configure(modelBuilder.Entity<Menu>());
+            new LoanConfiguration().Configure(modelBuilder.Entity<Loan>());
         }
     }
 }
