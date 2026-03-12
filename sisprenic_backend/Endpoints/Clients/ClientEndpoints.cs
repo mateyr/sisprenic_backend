@@ -9,7 +9,7 @@ namespace sisprenic_backend.Endpoints.Clients
             var route = app.MapGroup("/clients");
 
             route.MapGet("/", GetAllClients).RequireAuthorization("clients:read");
-            route.MapGet("/{id}", GetClient);
+            route.MapGet("/{id}", GetClient).RequireAuthorization("clients:read");
             route.MapPost("/", CreateClient);
             route.MapPut("/{id}", UpdateClient);
             route.MapDelete("/{id}", DeleteClient);

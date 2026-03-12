@@ -4,6 +4,6 @@ public record class CreateLoanDto(
     decimal Principal,
     decimal InterestRate,
     int TermMonths,
-    DateTime StartDate,
+    DateOnly StartDate,
     int ClientId
 );

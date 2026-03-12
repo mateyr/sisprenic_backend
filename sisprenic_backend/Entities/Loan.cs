@@ -8,7 +8,7 @@ public class Loan
     public decimal Principal { get; set; }
     public decimal InterestRate { get; set; }
     public int TermMonths { get; set; }
-    public DateTime StartDate { get; set; }
+    public DateOnly StartDate { get; set; }
 
     public int ClientId { get; set; }
     public required Client Client { get; set; }

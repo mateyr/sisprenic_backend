@@ -2,6 +2,7 @@
 using sisprenic_backend.Dtos.Clients;
 using sisprenic.Database;
 using sisprenic.Entities;
+using sisprenic_backend.Mapping;
 
 namespace sisprenic_backend.Endpoints.Clients;
 
@@ -16,9 +17,11 @@ public static class ClientTypedResults
 
     public static async Task<IResult> GetClient(int id, SisprenicContext dbContext)
     {
-        Client? client = await dbContext.Client.FindAsync(id);
+        Client? client = await dbContext.Client
+            .Include(c => c.Loans)
+            .FirstOrDefaultAsync(c => c.Id == id);
 
-        return client is null ? TypedResults.NotFound() : TypedResults.Ok(client);
+        return client is null ? TypedResults.NotFound() : TypedResults.Ok(client.ToClientDto());
     }
 
     public static async Task<IResult> CreateClient(Client client, SisprenicContext dbContext)
