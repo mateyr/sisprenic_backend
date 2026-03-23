@@ -7,6 +7,8 @@ using sisprenic_backend.Endpoints.Clients;
 using sisprenic_backend.Endpoints.Loans;
 using sisprenic_backend.Endpoints.Users;
 
+using Swashbuckle.AspNetCore.SwaggerUI;
+
 namespace Web.Api.Extensions;
 
 public static class ApplicationBuilderExtensions
@@ -18,6 +20,7 @@ public static class ApplicationBuilderExtensions
         {
             options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
             options.RoutePrefix = string.Empty;
+            options.DocExpansion(DocExpansion.None);
         });
 
         return app;

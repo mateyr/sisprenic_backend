@@ -20,4 +20,18 @@ public static class ClientMapping
             client.Loans.Select(l => l.ToLoanDto()).ToList()
         );
     }
+
+    public static GetAllClientDto ToAllClientsDto(this Client client)
+    {
+        return new GetAllClientDto
+        (
+            client.Id,
+            client.FirstName,
+            client.SecondName,
+            client.LastName,
+            client.SecondLastName,
+            client.Identification,
+            client.PhoneNumber
+        );
+    }
 }

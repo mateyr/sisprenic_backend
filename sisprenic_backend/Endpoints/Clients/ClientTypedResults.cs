@@ -10,7 +10,10 @@ public static class ClientTypedResults
 {
     public static async Task<IResult> GetAllClients(SisprenicContext dbContext)
     {
-        var clients = await dbContext.Client.AsNoTracking().ToListAsync();
+        List<GetAllClientDto>? clients = await dbContext.Client
+            .AsNoTracking()
+            .Select(c => c.ToAllClientsDto())
+            .ToListAsync();
 
         return TypedResults.Ok(clients);
     }
