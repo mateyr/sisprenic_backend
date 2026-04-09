@@ -5,6 +5,7 @@ using sisprenic.Database;
 using sisprenic_backend.Endpoints.Auth;
 using sisprenic_backend.Endpoints.Clients;
 using sisprenic_backend.Endpoints.Loans;
+using sisprenic_backend.Endpoints.Payments;
 using sisprenic_backend.Endpoints.Users;
 
 using Swashbuckle.AspNetCore.SwaggerUI;
@@ -38,6 +39,7 @@ public static class ApplicationBuilderExtensions
         app.MapUserEndpoints().WithTags("Users");
         app.MapClientEndpoints().WithTags("Clients");
         app.MapLoanEndpoints().WithTags("Loans");
+        app.MapPaymentEndpoints().WithTags("Payments");
         app.MapAuthEndpoints();
     }
 }

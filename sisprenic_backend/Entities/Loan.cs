@@ -12,4 +12,6 @@ public class Loan
 
     public int ClientId { get; set; }
     public required Client Client { get; set; }
+
+    public ICollection<Payment> Payments { get; set; } = new List<Payment>();
 }
