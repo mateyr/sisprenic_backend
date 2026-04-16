@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using sisprenic.Database;
 using sisprenic_backend.Dtos.Loans;
 using sisprenic_backend.Entities;
+using sisprenic_backend.Mapping;
 
 namespace sisprenic_backend.Endpoints.Loans;
 
@@ -15,8 +16,11 @@ public static class LoanTypedResults
 
     public static async Task<IResult> GetLoan(int id, SisprenicContext dbContext)
     {
-        Loan? loan = await dbContext.Loan.FindAsync(id);
-        return loan is null ? TypedResults.NotFound() : TypedResults.Ok(loan);
+        Loan? loan = await dbContext.Loan
+            .Include(l => l.Client)
+            .FirstOrDefaultAsync(l => l.Id == id);
+        
+        return loan is null ? TypedResults.NotFound() : TypedResults.Ok(loan.ToLoanDetailDto());
     }
 
     public static async Task<IResult> CreateLoan(CreateLoanDto createLoan, SisprenicContext dbContext)

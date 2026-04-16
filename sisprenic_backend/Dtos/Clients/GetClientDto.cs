@@ -22,3 +22,13 @@ public record class GetAllClientDto(
     string Identification,
     string PhoneNumber
 );
+
+public record class ClientSummaryDto(
+    int Id,
+    string FirstName,
+    string? SecondName,
+    string LastName,
+    string? SecondLastName,
+    string Identification,
+    string PhoneNumber
+);
