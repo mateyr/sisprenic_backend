@@ -8,3 +8,11 @@ public record class GetPaymentDto(
     string? Note,
     int LoanId
 );
+
+public record class GetPaymentDetailDto(
+    int Id,
+    decimal Principal,
+    decimal Interest,
+    DateOnly PaymentDay,
+    string? Note
+);

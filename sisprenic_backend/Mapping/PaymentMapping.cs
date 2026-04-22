@@ -16,4 +16,15 @@ public static class PaymentMapping
             payment.LoanId
         );
     }
+
+    public static GetPaymentDetailDto ToPaymentDetailDto(this Payment payment)
+    {
+        return new GetPaymentDetailDto(
+            payment.Id,
+            payment.Principal,
+            payment.Interest,
+            payment.PaymentDay,
+            payment.Note
+        );
+    }
 }

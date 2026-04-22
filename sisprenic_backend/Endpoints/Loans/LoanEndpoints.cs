@@ -10,6 +10,7 @@ public static class LoanEndpoints
 
         route.MapGet("/", GetAllLoans);
         route.MapGet("/{id}", GetLoan);
+        route.MapGet("/{id}/payments", GetLoanPayments);
         route.MapPost("/", CreateLoan);
         route.MapPut("/{id}", UpdateLoan);
         route.MapDelete("/{id}", DeleteLoan);
