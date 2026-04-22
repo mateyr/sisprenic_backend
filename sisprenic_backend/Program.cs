@@ -46,6 +46,7 @@ app.MapIdentityApi<IdentityUser>().WithTags("Authentication");
 app.MapEndpoints();
 
 await app.MigrateDbAsync();
+await app.SeedAdminAsync();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

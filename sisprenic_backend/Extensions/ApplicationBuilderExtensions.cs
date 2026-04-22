@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using sisprenic.Database;
@@ -32,6 +33,14 @@ public static class ApplicationBuilderExtensions
         using var scope = app.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<SisprenicContext>();
         await dbContext.Database.MigrateAsync();
+    }
+
+    public static async Task SeedAdminAsync(this WebApplication app)
+    {
+        using var scope = app.Services.CreateScope();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<SisprenicContext>();
+        await AdminSeeder.SeedAsync(userManager, dbContext);
     }
 
     public static void MapEndpoints(this WebApplication app)

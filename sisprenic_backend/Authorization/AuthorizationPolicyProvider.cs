@@ -5,6 +5,8 @@ namespace sisprenic_backend.Authorization;
 
 public class AuthorizationPolicyProvider : DefaultAuthorizationPolicyProvider
 {
+    private const string PermissionClaimType = "permission";
+
     public AuthorizationPolicyProvider(IOptions<AuthorizationOptions> options) : base(options)
     {
     }
@@ -19,7 +21,7 @@ public class AuthorizationPolicyProvider : DefaultAuthorizationPolicyProvider
 
 
         return new AuthorizationPolicyBuilder()
-            .RequireClaim("permission", policyName)
+            .RequireClaim(PermissionClaimType, policyName)
             .Build();
     }
 }
