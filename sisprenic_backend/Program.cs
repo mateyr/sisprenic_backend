@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 
+using Serilog;
+using Serilog.Events;
+
 using sisprenic.Database;
 using sisprenic.Extensions;
 
@@ -8,53 +11,80 @@ using sisprenic_backend.Authorization;
 
 using Web.Api.Extensions;
 
-var builder = WebApplication.CreateBuilder(args);
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
 
-string[]? allowedOrigins = builder.Configuration
-    .GetSection("AllowedOrigins")
-    .Get<string[]>() ?? Array.Empty<string>();
-
-builder.Services.AddDatabase(builder.Configuration);
-
-builder.Services.AddAuthorization()
-        .AddSingleton<IAuthorizationPolicyProvider, AuthorizationPolicyProvider>();
-
-
-builder.Services.AddIdentityApiEndpoints<IdentityUser>()
-    .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<SisprenicContext>();
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-builder.Services.AddCors(options =>
+try
 {
-    options.AddPolicy("AllowOrigins",
-                          policy =>
-                          {
-                              policy.WithOrigins(allowedOrigins)
-                                                  .AllowAnyHeader()
-                                                  .AllowAnyMethod()
-                                                  .AllowCredentials();
-                          });
-});
+    Log.Information("Starting web application");
 
-var app = builder.Build();
-app.MapIdentityApi<IdentityUser>().WithTags("Authentication");
+    var builder = WebApplication.CreateBuilder(args);
 
-// Map application endpoints
-app.MapEndpoints();
+    builder.Services.AddSerilog((services, lc) => lc
+        .ReadFrom.Configuration(builder.Configuration)
+        .ReadFrom.Services(services)
+        .Enrich.FromLogContext()
+        .WriteTo.Console());
 
-await app.MigrateDbAsync();
-await app.SeedAdminAsync();
+    string[]? allowedOrigins = builder.Configuration
+        .GetSection("AllowedOrigins")
+        .Get<string[]>() ?? Array.Empty<string>();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwaggerWithUi();
+    builder.Services.AddDatabase(builder.Configuration);
+
+    builder.Services.AddAuthorization()
+            .AddSingleton<IAuthorizationPolicyProvider, AuthorizationPolicyProvider>();
+
+    builder.Services.AddIdentityApiEndpoints<IdentityUser>()
+        .AddRoles<IdentityRole>()
+        .AddEntityFrameworkStores<SisprenicContext>();
+
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen();
+
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("AllowOrigins",
+                              policy =>
+                              {
+                                  policy.WithOrigins(allowedOrigins)
+                                                      .AllowAnyHeader()
+                                                      .AllowAnyMethod()
+                                                      .AllowCredentials();
+                              });
+    });
+
+    var app = builder.Build();
+
+    app.UseSerilogRequestLogging();
+
+    app.MapIdentityApi<IdentityUser>().WithTags("Authentication");
+
+    // Map application endpoints
+    app.MapEndpoints();
+
+    await app.MigrateDbAsync();
+    await app.SeedAdminAsync();
+
+    // Configure the HTTP request pipeline.
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwaggerWithUi();
+    }
+
+    app.UseHttpsRedirection();
+
+    app.UseCors("AllowOrigins");
+    app.Run();
 }
-
-app.UseHttpsRedirection();
-
-app.UseCors("AllowOrigins");
-app.Run();
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}
