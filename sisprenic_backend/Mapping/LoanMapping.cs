@@ -18,7 +18,7 @@ public static class LoanMapping
         );
     }
 
-    public static GetLoanDetailDto ToLoanDetailDto(this Loan loan)
+    public static GetLoanDetailDto ToLoanDetailDto(this Loan loan, LoanSummaryDto summary)
     {
         return new GetLoanDetailDto
         (
@@ -30,12 +30,13 @@ public static class LoanMapping
             new ClientSummaryDto(
                 loan.Client.Id,
                 loan.Client.FirstName,
-                loan.Client.SecondLastName,
+                loan.Client.SecondName,
                 loan.Client.LastName,
                 loan.Client.SecondLastName,
                 loan.Client.Identification,
                 loan.Client.PhoneNumber
-            )
+            ),
+            summary
         );
     }
 }

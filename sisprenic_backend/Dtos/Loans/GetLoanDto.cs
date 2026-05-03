@@ -16,5 +16,14 @@ public record GetLoanDetailDto(
     decimal InterestRate,
     int TermMonths,
     DateOnly StartDate,
-    ClientSummaryDto Client
+    ClientSummaryDto Client,
+    LoanSummaryDto Summary
+);
+
+public record LoanSummaryDto
+(
+    decimal PrincipalCurrent,
+    decimal InterestThisPeriod,
+    decimal InterestPending,
+    DateOnly NextPaymentDate
 );
