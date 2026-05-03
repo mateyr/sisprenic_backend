@@ -1,3 +1,6 @@
 <Solution>
+  <Folder Name="/tests/">
+    <Project Path="Sisprenic.UnitTests/Sisprenic.UnitTests.csproj" Id="e0a48c6a-ddd4-42ab-baf6-978746d76f74" />
+  </Folder>
   <Project Path="sisprenic_backend/sisprenic_backend.csproj" />
 </Solution>
