@@ -1,7 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FluentValidation;
+using FluentValidation.Results;
+
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
 using sisprenic.Database;
 
+using sisprenic_backend.Common;
 using sisprenic_backend.Dtos.Payments;
 using sisprenic_backend.Entities;
 using sisprenic_backend.Mapping;
@@ -29,25 +34,43 @@ public static class PaymentTypedResults
         return payment is null ? TypedResults.NotFound() : TypedResults.Ok(payment.ToPaymentDto());
     }
 
-    public static async Task<IResult> CreatePayment(CreatePaymentDto createPayment, SisprenicContext dbContext)
+    public static async Task<IResult> CreatePayment(
+        IValidator<CreatePaymentDto> validator,
+        CreatePaymentDto createPayment,
+        SisprenicContext dbContext)
     {
-        bool loanExists = await dbContext.Loan.AnyAsync(l => l.Id == createPayment.LoanId);
-        if (!loanExists) return TypedResults.BadRequest($"Loan with id {createPayment.LoanId} does not exist.");
+        ValidationResult validationResult = await validator.ValidateAsync(createPayment);
 
-        Payment payment = new()
+        if (!validationResult.IsValid)
         {
-            Principal = createPayment.Principal,
-            Interest = createPayment.Interest,
-            PaymentDay = createPayment.PaymentDay,
-            Note = createPayment.Note,
-            LoanId = createPayment.LoanId,
-            Loan = null!
-        };
+            return Results.ValidationProblem(validationResult.ToDictionary());
+        }
 
-        dbContext.Payment.Add(payment);
-        await dbContext.SaveChangesAsync();
+        Loan? loan = await dbContext.Loan
+            .AsNoTracking()
+            .FirstOrDefaultAsync(l => l.Id == createPayment.LoanId);
 
-        return TypedResults.Created($"/payments/{payment.Id}", payment.ToPaymentDto());
+        if (loan is null)
+        {
+            return Results.ValidationProblem(
+                new Dictionary<string, string[]>
+                {
+                    ["loanId"] = [$"No existe un préstamo con el id {createPayment.LoanId}."]
+                });
+        }
+
+        CreatePaymentResult result = await CreatePaymentService.Execute(loan, createPayment, dbContext);
+
+        if (!result.IsSuccess)
+        {
+            return Results.ValidationProblem(result.Errors!);
+        }
+
+        ApiResponse<GetPaymentDto> body = new(
+            Data: result.Payment!.ToPaymentDto(),
+            Message: result.Message);
+
+        return TypedResults.Created($"/payments/{result.Payment!.Id}", body);
     }
 
     public static async Task<IResult> DeletePayment(int id, SisprenicContext dbContext)

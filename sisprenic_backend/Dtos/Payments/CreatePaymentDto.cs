@@ -5,5 +5,5 @@ public record class CreatePaymentDto(
     decimal Interest,
     DateOnly PaymentDay,
     string? Note,
-    int LoanId
+    int? LoanId
 );

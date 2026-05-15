@@ -1,3 +1,5 @@
+using FluentValidation;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 
@@ -8,6 +10,9 @@ using sisprenic.Database;
 using sisprenic.Extensions;
 
 using sisprenic_backend.Authorization;
+using sisprenic_backend.Dtos.Loans;
+using sisprenic_backend.Dtos.Payments;
+using sisprenic_backend.Validators;
 
 using Web.Api.Extensions;
 
@@ -56,6 +61,9 @@ try
                                                       .AllowCredentials();
                               });
     });
+
+    // Validators
+    builder.Services.AddScoped<IValidator<CreatePaymentDto>, CreatePaymentValidator>();
 
     var app = builder.Build();
 
