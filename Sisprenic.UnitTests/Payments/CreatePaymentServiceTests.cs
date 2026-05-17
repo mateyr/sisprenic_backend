@@ -31,7 +31,7 @@ public sealed class CreatePaymentServiceTests
         CreatePaymentResult result = await CreatePaymentService.Execute(loan, dto, db);
 
         Assert.True(result.IsSuccess);
-        Assert.Null(result.Message);
+        Assert.Null(result.Messages);
         Assert.NotNull(result.Payment);
         Assert.Equal(2_000m, result.Payment!.Principal);
         Assert.Equal(1_000m, result.Payment.Interest);
@@ -49,8 +49,16 @@ public sealed class CreatePaymentServiceTests
         CreatePaymentResult result = await CreatePaymentService.Execute(loan, dto, db);
 
         Assert.True(result.IsSuccess);
-        Assert.Contains("El interés excedía el monto pendiente", result.Message ?? "");
-        Assert.DoesNotContain("Se enviaron", result.Message ?? "");
+
+        string[] messages = ExtractMessages(result);
+
+        Assert.Contains(
+            "500.00 enviados como interés excedían el interés pendiente y fueron aplicados a capital.",
+            messages);
+
+        Assert.DoesNotContain(
+            messages,
+            m => m.Contains("Se enviaron"));
         Assert.NotNull(result.Payment);
         Assert.Equal(500m, result.Payment!.Principal);
         Assert.Equal(1_000m, result.Payment.Interest);
@@ -67,9 +75,14 @@ public sealed class CreatePaymentServiceTests
         CreatePaymentResult result = await CreatePaymentService.Execute(loan, dto, db);
 
         Assert.True(result.IsSuccess);
-        Assert.NotNull(result.Message);
-        Assert.Contains("Se enviaron 15000.00 pero el sistema solo aplicó 11000.00", result.Message);
-        Assert.Contains("4000.00 no fueron registrados", result.Message);
+        
+        string[] messages = ExtractMessages(result);
+
+        Assert.Contains(
+            "Se enviaron 15000.00 pero el sistema solo aplicó 11000.00 para no exceder la deuda total. 4000.00 no fueron registrados.",
+            messages);
+
+        Assert.NotNull(result.Messages);
         Assert.NotNull(result.Payment);
         Assert.Equal(10_000m, result.Payment!.Principal);
         Assert.Equal(1_000m, result.Payment.Interest);
@@ -86,10 +99,20 @@ public sealed class CreatePaymentServiceTests
         CreatePaymentResult result = await CreatePaymentService.Execute(loan, dto, db);
 
         Assert.True(result.IsSuccess);
-        Assert.Equal("Se enviaron 12000.00 pero el sistema solo aplicó 10000.00 para no exceder la deuda total. 2000.00 no fueron registrados.", result.Message);
+        
+        string[] messages = ExtractMessages(result);
+
+        Assert.Contains(
+            "Existía interés pendiente; 1000.00 enviados como capital fueron aplicados a interés.",
+            messages);
+
+        Assert.Contains(
+            "Se enviaron 12000.00 pero el sistema solo aplicó 11000.00 para no exceder la deuda total. 1000.00 no fueron registrados.",
+            messages);
+
         Assert.NotNull(result.Payment);
         Assert.Equal(10_000m, result.Payment!.Principal);
-        Assert.Equal(0m, result.Payment.Interest);
+        Assert.Equal(1000m, result.Payment.Interest);
     }
 
     [Fact(DisplayName = "Mezcla: interés con exceso + capital hasta llenar débito total; sólo mensaje por no aplicado")]
@@ -103,14 +126,23 @@ public sealed class CreatePaymentServiceTests
         CreatePaymentResult result = await CreatePaymentService.Execute(loan, dto, db);
 
         Assert.True(result.IsSuccess);
-        Assert.Equal("Se enviaron 11500.00 pero el sistema solo aplicó 11000.00 para no exceder la deuda total. 500.00 no fueron registrados.", result.Message);
+        
+        string[] messages = ExtractMessages(result);
+
+        Assert.Contains(
+            "Se enviaron 11500.00 pero el sistema solo aplicó 11000.00 para no exceder la deuda total. 500.00 no fueron registrados.",
+            messages);
+
+        Assert.DoesNotContain(
+            messages,
+            m => m.Contains("exceso", StringComparison.OrdinalIgnoreCase));
+
         Assert.NotNull(result.Payment);
         Assert.Equal(10_000m, result.Payment!.Principal);
         Assert.Equal(1_000m, result.Payment.Interest);
-        Assert.DoesNotContain("exceso", result.Message!, StringComparison.OrdinalIgnoreCase);
     }
 
-    [Fact(DisplayName = "Sin interés pendiente: montos marcados como interés pasan a capital con mensaje claro")]
+    [Fact(DisplayName = "Sin interés pendiente: montos marcados como interés pasan a capital")]
     public async Task NoInterestOutstanding_InterestMarkedGoesToPrincipal_WithMessage()
     {
         (string dbName, Loan loan) = await SeedFreshLoanAsync();
@@ -135,8 +167,13 @@ public sealed class CreatePaymentServiceTests
         CreatePaymentResult result = await CreatePaymentService.Execute(loan, dto, db);
 
         Assert.True(result.IsSuccess);
-        Assert.Equal("No había interés pendiente; el monto enviado como interés se registró como capital.", result.Message);
-        Assert.NotNull(result.Payment);
+        
+        string[] messages = ExtractMessages(result);
+
+        Assert.Contains(
+            "No había interés pendiente; 500.00 enviados como interés fueron aplicados a capital.",
+            messages); Assert.NotNull(result.Payment);
+
         Assert.Equal(500m, result.Payment!.Principal);
         Assert.Equal(0m, result.Payment.Interest);
     }
@@ -184,6 +221,74 @@ public sealed class CreatePaymentServiceTests
         Assert.Contains("inicio del préstamo", result.Errors!["paymentDay"][0]);
         Assert.Equal(0, await db.Payment.CountAsync(TestContext.Current.CancellationToken));
     }
+
+    [Fact(DisplayName = "Capital enviado con interés pendiente: cubre interés primero y resto a capital")]
+    public async Task PrincipalPayment_WithOutstandingInterest_AppliesInterestFirst_ThenPrincipal()
+    {
+        (string dbName, Loan loan) = await SeedFreshLoanAsync();
+        await using SisprenicContext db = CreateContext(dbName);
+
+        CreatePaymentDto dto = new(
+            Principal: 2_000m,
+            Interest: 0m,
+            PaymentDay: Anchor,
+            Note: null,
+            LoanId: loan.Id);
+
+        CreatePaymentResult result =
+            await CreatePaymentService.Execute(loan, dto, db);
+
+        Assert.True(result.IsSuccess);
+        
+        string[] messages = ExtractMessages(result);
+
+        Assert.Contains(
+            "Existía interés pendiente; 1000.00 enviados como capital fueron aplicados a interés.",
+            messages);
+        
+        Assert.Equal(1_000m, result.Payment!.Interest);
+        Assert.Equal(1_000m, result.Payment.Principal);
+    }
+
+    [Fact(DisplayName = "Pago genera múltiples mensajes cuando redistribuye y descarta excedente")]
+    public async Task PaymentRedistributionAndOverflow_ReturnsMultipleMessages()
+    {
+        (string dbName, Loan loan) = await SeedFreshLoanAsync();
+
+        await using SisprenicContext db = CreateContext(dbName);
+
+        CreatePaymentDto dto = new(
+            Principal: 12_000m,
+            Interest: 0m,
+            PaymentDay: Anchor,
+            Note: null,
+            LoanId: loan.Id);
+
+        CreatePaymentResult result =
+            await CreatePaymentService.Execute(loan, dto, db);
+
+        Assert.True(result.IsSuccess);
+
+        Assert.NotNull(result.Messages);
+        Assert.Equal(2, result.Messages!.Count);
+
+        Assert.Contains(
+            result.Messages,
+            m => m.Code == "interest_applied_from_principal");
+
+        Assert.Contains(
+            result.Messages,
+            m => m.Code == "amount_unapplied");
+
+        Assert.Equal(10_000m, result.Payment!.Principal);
+        Assert.Equal(1_000m, result.Payment.Interest);
+    }
+
+    private static string[] ExtractMessages(CreatePaymentResult result) =>
+        result.Messages?
+            .Select(m => m.Message)
+            .ToArray()
+        ?? [];
 
     private static SisprenicContext CreateContext(string databaseName) =>
         new(new DbContextOptionsBuilder<SisprenicContext>()

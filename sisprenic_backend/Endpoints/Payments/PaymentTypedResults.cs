@@ -68,7 +68,7 @@ public static class PaymentTypedResults
 
         ApiResponse<GetPaymentDto> body = new(
             Data: result.Payment!.ToPaymentDto(),
-            Message: result.Message);
+            Messages: result.Messages);
 
         return TypedResults.Created($"/payments/{result.Payment!.Id}", body);
     }

@@ -31,8 +31,7 @@ try
     builder.Services.AddSerilog((services, lc) => lc
         .ReadFrom.Configuration(builder.Configuration)
         .ReadFrom.Services(services)
-        .Enrich.FromLogContext()
-        .WriteTo.Console());
+        .Enrich.FromLogContext());
 
     string[]? allowedOrigins = builder.Configuration
         .GetSection("AllowedOrigins")
