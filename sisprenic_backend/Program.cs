@@ -85,6 +85,10 @@ try
     app.UseHttpsRedirection();
 
     app.UseCors("AllowOrigins");
+
+    app.UseAuthentication();
+    app.UseAuthorization();
+
     app.Run();
 }
 catch (Exception ex)
