@@ -63,6 +63,8 @@ try
 
     // Validators
     builder.Services.AddScoped<IValidator<CreatePaymentDto>, CreatePaymentValidator>();
+    builder.Services.AddScoped<IValidator<CreateLoanDto>, CreateLoanValidator>();
+    builder.Services.AddScoped<IValidator<UpdateLoanDto>, UpdateLoanValidator>();
 
     var app = builder.Build();
 

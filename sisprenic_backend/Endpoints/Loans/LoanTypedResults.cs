@@ -1,5 +1,10 @@
+using FluentValidation;
+using FluentValidation.Results;
+
 using Microsoft.EntityFrameworkCore;
+
 using sisprenic.Database;
+
 using sisprenic_backend.Dtos.Loans;
 using sisprenic_backend.Dtos.Payments;
 using sisprenic_backend.Endpoints.Loans.Services;
@@ -48,18 +53,35 @@ public static class LoanTypedResults
         return TypedResults.Ok(payments);
     }
 
-    public static async Task<IResult> CreateLoan(CreateLoanDto createLoan, SisprenicContext dbContext)
+    public static async Task<IResult> CreateLoan(
+        IValidator<CreateLoanDto> validator,
+        CreateLoanDto createLoan,
+        SisprenicContext dbContext)
     {
+        ValidationResult validationResult = await validator.ValidateAsync(createLoan);
+
+        if (!validationResult.IsValid)
+        {
+            return Results.ValidationProblem(validationResult.ToDictionary());
+        }
+
         bool clientExists = await dbContext.Client.AnyAsync(c => c.Id == createLoan.ClientId);
-        if (!clientExists) return TypedResults.BadRequest($"Client with id {createLoan.ClientId} does not exist.");
+        if (!clientExists)
+        {
+            return Results.ValidationProblem(
+                new Dictionary<string, string[]>
+                {
+                    ["ClientId"] = [$"No existe un cliente con el id {createLoan.ClientId}."]
+                });
+        }
 
         Loan loan = new()
         {
-            Principal = createLoan.Principal,
-            InterestRate = createLoan.InterestRate,
-            TermMonths = createLoan.TermMonths,
-            StartDate = createLoan.StartDate,
-            ClientId = createLoan.ClientId,
+            Principal = createLoan.Principal!.Value,
+            InterestRate = createLoan.InterestRate!.Value,
+            TermMonths = createLoan.TermMonths!.Value,
+            StartDate = createLoan.StartDate!.Value,
+            ClientId = createLoan.ClientId!.Value,
             Client = null!
         };
 
@@ -68,18 +90,55 @@ public static class LoanTypedResults
         return TypedResults.Created($"/loans/{loan.Id}", loan);
     }
 
-    public static async Task<IResult> UpdateLoan(int id, UpdateLoanDto updateLoan, SisprenicContext dbContext)
+    public static async Task<IResult> UpdateLoan(
+        int id,
+        IValidator<UpdateLoanDto> validator,
+        UpdateLoanDto updateLoan,
+        SisprenicContext dbContext)
     {
+        ValidationResult validationResult = await validator.ValidateAsync(updateLoan);
+
+        if (!validationResult.IsValid)
+        {
+            return Results.ValidationProblem(validationResult.ToDictionary());
+        }
+
         Loan? loan = await dbContext.Loan.FindAsync(id);
         if (loan is null) return TypedResults.NotFound();
 
-        if (loan.ClientId != updateLoan.ClientId)
+        bool hasPayments = await dbContext.Payment.AnyAsync(p => p.LoanId == id);
+
+        if (hasPayments)
         {
-            bool clientExists = await dbContext.Client.AnyAsync(c => c.Id == updateLoan.ClientId);
-            if (!clientExists) return TypedResults.BadRequest($"Client with id {updateLoan.ClientId} does not exist.");
+            bool tryingToChangeRestrictedFields =
+                updateLoan.Principal.HasValue ||
+                updateLoan.InterestRate.HasValue ||
+                updateLoan.TermMonths.HasValue ||
+                updateLoan.StartDate.HasValue;
+
+            if (tryingToChangeRestrictedFields)
+                return Results.ValidationProblem(new Dictionary<string, string[]>
+                {
+                    [""] = ["No se puede modificar un préstamo que ya tiene pagos registrados. Solo está permitido cambiar el cliente."]
+                });
         }
 
-        dbContext.Entry(loan).CurrentValues.SetValues(updateLoan);
+        if (updateLoan.ClientId.HasValue && loan.ClientId != updateLoan.ClientId.Value)
+        {
+            bool clientExists = await dbContext.Client.AnyAsync(c => c.Id == updateLoan.ClientId.Value);
+            if (!clientExists)
+                return Results.ValidationProblem(new Dictionary<string, string[]>
+                {
+                    ["ClientId"] = [$"No existe un cliente con el id {updateLoan.ClientId.Value}."]
+                });
+        }
+
+        if (updateLoan.Principal.HasValue)    loan.Principal    = updateLoan.Principal.Value;
+        if (updateLoan.InterestRate.HasValue) loan.InterestRate = updateLoan.InterestRate.Value;
+        if (updateLoan.TermMonths.HasValue)   loan.TermMonths   = updateLoan.TermMonths.Value;
+        if (updateLoan.StartDate.HasValue)    loan.StartDate    = updateLoan.StartDate.Value;
+        if (updateLoan.ClientId.HasValue)     loan.ClientId     = updateLoan.ClientId.Value;
+
         await dbContext.SaveChangesAsync();
         return TypedResults.NoContent();
     }
