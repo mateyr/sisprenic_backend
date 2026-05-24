@@ -147,6 +147,17 @@ public static class LoanTypedResults
     {
         Loan? loan = await dbContext.Loan.FindAsync(id);
         if (loan is null) return TypedResults.NotFound();
+
+        bool hasPayments = await dbContext.Payment.AnyAsync(p => p.LoanId == id);
+        if (hasPayments)
+        {
+            return Results.ValidationProblem(
+                new Dictionary<string, string[]>
+                {
+                    ["payments"] = ["No se puede eliminar un préstamo que cuenta con pagos registrados."]
+                });
+        }
+
         dbContext.Loan.Remove(loan);
         await dbContext.SaveChangesAsync();
         return TypedResults.NoContent();

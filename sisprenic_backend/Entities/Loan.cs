@@ -2,7 +2,7 @@
 
 namespace sisprenic_backend.Entities;
 
-public class Loan
+public class Loan : ISoftDeletable
 {
     public int Id { get; set; }
     public decimal Principal { get; set; }
@@ -14,4 +14,7 @@ public class Loan
     public required Client Client { get; set; }
 
     public ICollection<Payment> Payments { get; set; } = new List<Payment>();
+
+    public bool IsDeleted { get; set; }
+    public DateTime? DeletedOnUtc { get; set; }
 }

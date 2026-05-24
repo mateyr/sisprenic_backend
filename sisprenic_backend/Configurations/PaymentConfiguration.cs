@@ -27,7 +27,8 @@ public class PaymentConfiguration : IEntityTypeConfiguration<Payment>
 
         builder.HasOne(p => p.Loan)
             .WithMany(l => l.Payments)
-            .HasForeignKey(p => p.LoanId);
+            .HasForeignKey(p => p.LoanId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         // Evita pagos inválidos:
         // - No permite valores negativos

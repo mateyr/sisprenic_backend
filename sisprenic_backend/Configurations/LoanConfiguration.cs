@@ -36,5 +36,14 @@ public class LoanConfiguration : IEntityTypeConfiguration<Loan>
             .WithMany(c => c.Loans)
             .HasForeignKey(l => l.ClientId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Property(l => l.IsDeleted).HasDefaultValue(false).IsRequired();
+        builder.Property(l => l.DeletedOnUtc).IsRequired(false);
+
+        builder.HasQueryFilter(l => !l.IsDeleted);
+
+        builder.HasIndex(l => l.IsDeleted)
+            .HasFilter("is_deleted = false")
+            .HasDatabaseName("ix_loan_is_deleted");
     }
 }
