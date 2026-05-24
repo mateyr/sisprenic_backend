@@ -13,10 +13,13 @@ public static class ServiceCollectionExtensions
     {
         string? connString = configuration.GetConnectionString("Sisprenic");
 
-        services.AddDbContext<SisprenicContext>(options =>
+        services.AddSingleton<SoftDeleteInterceptor>();
+
+        services.AddDbContext<SisprenicContext>((sp, options) =>
             options.UseNpgsql(connString)
             .UseSnakeCaseNamingConvention()
-            .UseSeeding(async (context, _) =>
+            .AddInterceptors(sp.GetRequiredService<SoftDeleteInterceptor>())
+            .UseSeeding((context, _) =>
             {
                 if (!context.Set<Menu>().Any())
                 {

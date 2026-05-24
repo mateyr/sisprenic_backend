@@ -38,5 +38,14 @@ public class PaymentConfiguration : IEntityTypeConfiguration<Payment>
                 "Principal >= 0 AND Interest >= 0 AND (Principal > 0 OR Interest > 0)"
             )
         );
+
+        builder.Property(p => p.IsDeleted).HasDefaultValue(false).IsRequired();
+        builder.Property(p => p.DeletedOnUtc).IsRequired(false);
+
+        builder.HasQueryFilter(p => !p.IsDeleted);
+
+        builder.HasIndex(p => p.IsDeleted)
+            .HasFilter("is_deleted = false")
+            .HasDatabaseName("ix_payment_is_deleted");
     }
 }
