@@ -41,7 +41,7 @@ public class PaymentConfiguration : IEntityTypeConfiguration<Payment>
         );
 
         builder.Property(p => p.IsDeleted).HasDefaultValue(false).IsRequired();
-        builder.Property(p => p.DeletedOnUtc).IsRequired(false);
+        builder.Property(p => p.DeletedOn).IsRequired(false);
 
         builder.HasQueryFilter(p => !p.IsDeleted);
 
