@@ -57,6 +57,17 @@ public static class ClientTypedResults
         if (client is null)
             return TypedResults.NotFound();
 
+        bool hasLoans = await dbContext.Loan.AnyAsync(p => p.ClientId == id);
+        
+        if (hasLoans)
+        {
+            return Results.ValidationProblem(
+                new Dictionary<string, string[]>
+                {
+                    ["client"] = ["No se puede eliminar el cliente porque tiene préstamos registrados."]
+                });
+        }
+
         dbContext.Client.Remove(client);
         await dbContext.SaveChangesAsync();
 
