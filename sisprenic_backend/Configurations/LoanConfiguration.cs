@@ -38,7 +38,7 @@ public class LoanConfiguration : IEntityTypeConfiguration<Loan>
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.Property(l => l.IsDeleted).HasDefaultValue(false).IsRequired();
-        builder.Property(l => l.DeletedOnUtc).IsRequired(false);
+        builder.Property(l => l.DeletedOn).IsRequired(false);
 
         builder.HasQueryFilter(l => !l.IsDeleted);
 

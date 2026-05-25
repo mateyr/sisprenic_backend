@@ -17,7 +17,12 @@ public static class LoanTypedResults
 {
     public static async Task<IResult> GetAllLoans(SisprenicContext dbContext)
     {
-        var loans = await dbContext.Loan.AsNoTracking().ToListAsync();
+        List<GetLoanListDto> loans = await dbContext.Loan
+            .Include(l => l.Client)
+            .AsNoTracking()
+            .Select(l => l.ToLoanListDto())
+            .ToListAsync();
+
         return TypedResults.Ok(loans);
     }
 

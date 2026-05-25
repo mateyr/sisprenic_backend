@@ -12,5 +12,5 @@ public class Payment : ISoftDeletable
     public required Loan Loan { get; set; }
 
     public bool IsDeleted { get; set; }
-    public DateTime? DeletedOnUtc { get; set; }
+    public DateTime? DeletedOn { get; set; }
 }

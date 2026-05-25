@@ -10,6 +10,15 @@ public record class GetLoanDto(
     DateOnly StartDate
 );
 
+public record GetLoanListDto(
+    int Id,
+    decimal Principal,
+    decimal InterestRate,
+    int TermMonths,
+    DateOnly StartDate,
+    ClientSummaryDto Client
+);
+
 public record GetLoanDetailDto(
     int Id,
     decimal Principal,

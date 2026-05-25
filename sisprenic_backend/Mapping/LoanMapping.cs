@@ -18,6 +18,27 @@ public static class LoanMapping
         );
     }
 
+    public static GetLoanListDto ToLoanListDto(this Loan loan)
+    {
+        return new GetLoanListDto
+        (
+            loan.Id,
+            loan.Principal,
+            loan.InterestRate,
+            loan.TermMonths,
+            loan.StartDate,
+            new ClientSummaryDto(
+                loan.Client.Id,
+                loan.Client.FirstName,
+                loan.Client.SecondName,
+                loan.Client.LastName,
+                loan.Client.SecondLastName,
+                loan.Client.Identification,
+                loan.Client.PhoneNumber
+            )
+        );
+    }
+
     public static GetLoanDetailDto ToLoanDetailDto(this Loan loan, LoanSummaryDto summary)
     {
         return new GetLoanDetailDto
