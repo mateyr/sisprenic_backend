@@ -2,9 +2,8 @@ using Xunit;
 
 using sisprenic.Entities;
 
-using sisprenic_backend.Dtos.Loans;
-using sisprenic_backend.Endpoints.Loans.Services;
 using sisprenic_backend.Entities;
+using sisprenic_backend.Modules.Loans.Shared;
 
 namespace Sisprenic.UnitTests.Loans;
 

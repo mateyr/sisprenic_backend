@@ -3,11 +3,11 @@ using Microsoft.EntityFrameworkCore;
 
 using sisprenic.Database;
 
-using sisprenic_backend.Endpoints.Auth;
-using sisprenic_backend.Endpoints.Clients;
-using sisprenic_backend.Endpoints.Loans;
-using sisprenic_backend.Endpoints.Payments;
-using sisprenic_backend.Endpoints.Users;
+using sisprenic_backend.Modules.Auth;
+using sisprenic_backend.Modules.Clients;
+using sisprenic_backend.Modules.Loans;
+using sisprenic_backend.Modules.Payments;
+using sisprenic_backend.Modules.Users;
 
 using Swashbuckle.AspNetCore.SwaggerUI;
 
@@ -45,10 +45,10 @@ public static class ApplicationBuilderExtensions
 
     public static void MapEndpoints(this WebApplication app)
     {
-        app.MapUserEndpoints().WithTags("Users");
-        app.MapClientEndpoints().WithTags("Clients");
-        app.MapLoanEndpoints().WithTags("Loans");
-        app.MapPaymentEndpoints().WithTags("Payments");
-        app.MapAuthEndpoints();
+        app.MapUsersModule();
+        app.MapClientsModule();
+        app.MapLoansModule();
+        app.MapPaymentsModule();
+        app.MapAuthModule();
     }
 }

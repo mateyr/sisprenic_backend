@@ -10,9 +10,9 @@ using sisprenic.Database;
 using sisprenic.Extensions;
 
 using sisprenic_backend.Authorization;
-using sisprenic_backend.Dtos.Loans;
-using sisprenic_backend.Dtos.Payments;
-using sisprenic_backend.Validators;
+using sisprenic_backend.Modules.Loans.CreateLoan;
+using sisprenic_backend.Modules.Loans.UpdateLoan;
+using sisprenic_backend.Modules.Payments.CreatePayment;
 
 using Web.Api.Extensions;
 
@@ -62,9 +62,9 @@ try
     });
 
     // Validators
-    builder.Services.AddScoped<IValidator<CreatePaymentDto>, CreatePaymentValidator>();
-    builder.Services.AddScoped<IValidator<CreateLoanDto>, CreateLoanValidator>();
-    builder.Services.AddScoped<IValidator<UpdateLoanDto>, UpdateLoanValidator>();
+    builder.Services.AddScoped<IValidator<CreatePaymentRequest>, CreatePaymentValidator>();
+    builder.Services.AddScoped<IValidator<CreateLoanRequest>, CreateLoanValidator>();
+    builder.Services.AddScoped<IValidator<UpdateLoanRequest>, UpdateLoanValidator>();
 
     var app = builder.Build();
 

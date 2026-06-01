@@ -4,16 +4,15 @@ using sisprenic.Database;
 
 using sisprenic.Entities;
 
-using sisprenic_backend.Dtos.Payments;
-using sisprenic_backend.Endpoints.Payments;
 using sisprenic_backend.Entities;
+using sisprenic_backend.Modules.Payments.CreatePayment;
 
 using Xunit;
 
 namespace Sisprenic.UnitTests.Payments;
 
 /// <summary>
-/// Prueba <see cref="CreatePaymentService.Execute"/> contra un contexto EF in-memory:
+/// Prueba <see cref="CreatePaymentHandler.Execute"/> contra un contexto EF in-memory:
 /// límites de interés/capital, mensajes cuando sobra importe y fallos declarados.
 /// </summary>
 public sealed class CreatePaymentServiceTests
@@ -26,9 +25,9 @@ public sealed class CreatePaymentServiceTests
         (string dbName, Loan loan) = await SeedFreshLoanAsync();
         await using SisprenicContext db = CreateContext(dbName);
 
-        CreatePaymentDto dto = new(Principal: 2_000m, Interest: 1_000m, PaymentDay: new DateOnly(2026, 1, 15), Note: null, LoanId: loan.Id);
+        CreatePaymentRequest dto = new(Principal: 2_000m, Interest: 1_000m, PaymentDay: new DateOnly(2026, 1, 15), Note: null, LoanId: loan.Id);
 
-        CreatePaymentResult result = await CreatePaymentService.Execute(loan, dto, db);
+        CreatePaymentResult result = await CreatePaymentHandler.Execute(loan, dto, db);
 
         Assert.True(result.IsSuccess);
         Assert.Null(result.Messages);
@@ -44,9 +43,9 @@ public sealed class CreatePaymentServiceTests
         (string dbName, Loan loan) = await SeedFreshLoanAsync();
         await using SisprenicContext db = CreateContext(dbName);
 
-        CreatePaymentDto dto = new(Principal: 0m, Interest: 1_500m, PaymentDay: new DateOnly(2026, 1, 15), Note: null, LoanId: loan.Id);
+        CreatePaymentRequest dto = new(Principal: 0m, Interest: 1_500m, PaymentDay: new DateOnly(2026, 1, 15), Note: null, LoanId: loan.Id);
 
-        CreatePaymentResult result = await CreatePaymentService.Execute(loan, dto, db);
+        CreatePaymentResult result = await CreatePaymentHandler.Execute(loan, dto, db);
 
         Assert.True(result.IsSuccess);
 
@@ -70,9 +69,9 @@ public sealed class CreatePaymentServiceTests
         (string dbName, Loan loan) = await SeedFreshLoanAsync();
         await using SisprenicContext db = CreateContext(dbName);
 
-        CreatePaymentDto dto = new(Principal: 0m, Interest: 15_000m, PaymentDay: new DateOnly(2026, 1, 15), Note: null, LoanId: loan.Id);
+        CreatePaymentRequest dto = new(Principal: 0m, Interest: 15_000m, PaymentDay: new DateOnly(2026, 1, 15), Note: null, LoanId: loan.Id);
 
-        CreatePaymentResult result = await CreatePaymentService.Execute(loan, dto, db);
+        CreatePaymentResult result = await CreatePaymentHandler.Execute(loan, dto, db);
 
         Assert.True(result.IsSuccess);
         
@@ -94,9 +93,9 @@ public sealed class CreatePaymentServiceTests
         (string dbName, Loan loan) = await SeedFreshLoanAsync();
         await using SisprenicContext db = CreateContext(dbName);
 
-        CreatePaymentDto dto = new(Principal: 12_000m, Interest: 0m, PaymentDay: new DateOnly(2026, 1, 15), Note: null, LoanId: loan.Id);
+        CreatePaymentRequest dto = new(Principal: 12_000m, Interest: 0m, PaymentDay: new DateOnly(2026, 1, 15), Note: null, LoanId: loan.Id);
 
-        CreatePaymentResult result = await CreatePaymentService.Execute(loan, dto, db);
+        CreatePaymentResult result = await CreatePaymentHandler.Execute(loan, dto, db);
 
         Assert.True(result.IsSuccess);
         
@@ -121,9 +120,9 @@ public sealed class CreatePaymentServiceTests
         (string dbName, Loan loan) = await SeedFreshLoanAsync();
         await using SisprenicContext db = CreateContext(dbName);
 
-        CreatePaymentDto dto = new(Principal: 10_000m, Interest: 1_500m, PaymentDay: new DateOnly(2026, 1, 15), Note: null, LoanId: loan.Id);
+        CreatePaymentRequest dto = new(Principal: 10_000m, Interest: 1_500m, PaymentDay: new DateOnly(2026, 1, 15), Note: null, LoanId: loan.Id);
 
-        CreatePaymentResult result = await CreatePaymentService.Execute(loan, dto, db);
+        CreatePaymentResult result = await CreatePaymentHandler.Execute(loan, dto, db);
 
         Assert.True(result.IsSuccess);
         
@@ -162,9 +161,9 @@ public sealed class CreatePaymentServiceTests
         }
 
         await using SisprenicContext db = CreateContext(dbName);
-        CreatePaymentDto dto = new(Principal: 0m, Interest: 500m, PaymentDay: cycle0Day, Note: null, LoanId: loan.Id);
+        CreatePaymentRequest dto = new(Principal: 0m, Interest: 500m, PaymentDay: cycle0Day, Note: null, LoanId: loan.Id);
 
-        CreatePaymentResult result = await CreatePaymentService.Execute(loan, dto, db);
+        CreatePaymentResult result = await CreatePaymentHandler.Execute(loan, dto, db);
 
         Assert.True(result.IsSuccess);
         
@@ -198,9 +197,9 @@ public sealed class CreatePaymentServiceTests
         }
 
         await using SisprenicContext db = CreateContext(dbName);
-        CreatePaymentDto dto = new(Principal: 1m, Interest: 0m, PaymentDay: payDay, Note: null, LoanId: loan.Id);
+        CreatePaymentRequest dto = new(Principal: 1m, Interest: 0m, PaymentDay: payDay, Note: null, LoanId: loan.Id);
 
-        CreatePaymentResult result = await CreatePaymentService.Execute(loan, dto, db);
+        CreatePaymentResult result = await CreatePaymentHandler.Execute(loan, dto, db);
 
         Assert.False(result.IsSuccess);
         Assert.Equal(["El préstamo ya ha sido pagado en su totalidad."], result.Errors!["loan"]);
@@ -213,9 +212,9 @@ public sealed class CreatePaymentServiceTests
         (string dbName, Loan loan) = await SeedFreshLoanAsync();
         await using SisprenicContext db = CreateContext(dbName);
 
-        CreatePaymentDto dto = new(Principal: 100m, Interest: 0m, PaymentDay: Anchor.AddDays(-1), Note: null, LoanId: loan.Id);
+        CreatePaymentRequest dto = new(Principal: 100m, Interest: 0m, PaymentDay: Anchor.AddDays(-1), Note: null, LoanId: loan.Id);
 
-        CreatePaymentResult result = await CreatePaymentService.Execute(loan, dto, db);
+        CreatePaymentResult result = await CreatePaymentHandler.Execute(loan, dto, db);
 
         Assert.False(result.IsSuccess);
         Assert.Contains("inicio del préstamo", result.Errors!["paymentDay"][0]);
@@ -228,7 +227,7 @@ public sealed class CreatePaymentServiceTests
         (string dbName, Loan loan) = await SeedFreshLoanAsync();
         await using SisprenicContext db = CreateContext(dbName);
 
-        CreatePaymentDto dto = new(
+        CreatePaymentRequest dto = new(
             Principal: 2_000m,
             Interest: 0m,
             PaymentDay: Anchor,
@@ -236,7 +235,7 @@ public sealed class CreatePaymentServiceTests
             LoanId: loan.Id);
 
         CreatePaymentResult result =
-            await CreatePaymentService.Execute(loan, dto, db);
+            await CreatePaymentHandler.Execute(loan, dto, db);
 
         Assert.True(result.IsSuccess);
         
@@ -257,7 +256,7 @@ public sealed class CreatePaymentServiceTests
 
         await using SisprenicContext db = CreateContext(dbName);
 
-        CreatePaymentDto dto = new(
+        CreatePaymentRequest dto = new(
             Principal: 12_000m,
             Interest: 0m,
             PaymentDay: Anchor,
@@ -265,7 +264,7 @@ public sealed class CreatePaymentServiceTests
             LoanId: loan.Id);
 
         CreatePaymentResult result =
-            await CreatePaymentService.Execute(loan, dto, db);
+            await CreatePaymentHandler.Execute(loan, dto, db);
 
         Assert.True(result.IsSuccess);
 
