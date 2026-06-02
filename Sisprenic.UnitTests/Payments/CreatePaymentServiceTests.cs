@@ -1,11 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 
-using sisprenic.Database;
+using Sisprenic.Api.Database;
 
-using sisprenic.Entities;
-
-using sisprenic_backend.Entities;
-using sisprenic_backend.Modules.Payments.CreatePayment;
+using Sisprenic.Api.Entities;
+using Sisprenic.Api.Modules.Payments.CreatePayment;
 
 using Xunit;
 

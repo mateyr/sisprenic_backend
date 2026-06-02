@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\sisprenic_backend\sisprenic_backend.csproj" />
+    <ProjectReference Include="..\Sisprenic.Api\Sisprenic.Api.csproj" />
   </ItemGroup>
 
 </Project>
