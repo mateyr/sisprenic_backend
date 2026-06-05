@@ -14,6 +14,8 @@ using Sisprenic.Api.Modules.Loans.CreateLoan;
 using Sisprenic.Api.Modules.Loans.UpdateLoan;
 using Sisprenic.Api.Modules.Payments.CreatePayment;
 
+using Sisprenic.Reports.Extensions;
+
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
     .Enrich.FromLogContext()
@@ -64,6 +66,8 @@ try
     builder.Services.AddScoped<IValidator<CreateLoanRequest>, CreateLoanValidator>();
     builder.Services.AddScoped<IValidator<UpdateLoanRequest>, UpdateLoanValidator>();
 
+    builder.Services.AddReporting();
+
     var app = builder.Build();
 
     app.UseSerilogRequestLogging();
@@ -75,6 +79,9 @@ try
 
     await app.MigrateDbAsync();
     await app.SeedAdminAsync();
+
+    // Initializes Playwright and prepares Chromium for PDF generation at startup
+    await app.InitializeReportingAsync();
 
     // Configure the HTTP request pipeline.
     if (app.Environment.IsDevelopment())

@@ -2,6 +2,7 @@ using Sisprenic.Api.Modules.Loans.CreateLoan;
 using Sisprenic.Api.Modules.Loans.DeleteLoan;
 using Sisprenic.Api.Modules.Loans.GetAllLoans;
 using Sisprenic.Api.Modules.Loans.GetLoanById;
+using Sisprenic.Api.Modules.Loans.GetLoanContract;
 using Sisprenic.Api.Modules.Loans.GetLoanPayments;
 using Sisprenic.Api.Modules.Loans.UpdateLoan;
 
@@ -16,6 +17,7 @@ public static class LoansModule
         group.MapGetAllLoans();
         group.MapGetLoanById();
         group.MapGetLoanPayments();
+        group.MapGetLoanContract();
         group.MapCreateLoan();
         group.MapUpdateLoan();
         group.MapDeleteLoan();

@@ -1,0 +1,180 @@
+@using System.Globalization
+@model Sisprenic.Reports.Reports.LoanContract.LoanContractViewModel
+@{
+    // Fixed culture so money/date formatting is consistent regardless of the server thread culture.
+    var culture = CultureInfo.GetCultureInfo("es-NI");
+
+    string Money(decimal value) => $"{Model.Terms.Currency} {value.ToString("N2", culture)}";
+    string Date(DateOnly value) => value.ToString("dd 'de' MMMM 'de' yyyy", culture);
+    string ratePercent = (Model.Terms.MonthlyInterestRate * 100m).ToString("0.##", culture);
+}
+
+<style>
+	.report-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		border-bottom: 2px solid var(--color-accent);
+		padding-bottom: 12px;
+		margin-bottom: 24px;
+	}
+
+	.report-header__brand {
+		font-size: 20px;
+		font-weight: 700;
+		color: var(--color-accent);
+		letter-spacing: 0.5px;
+	}
+
+	.report-header__meta {
+		text-align: right;
+		color: var(--color-muted);
+		font-size: 11px;
+	}
+
+	.report-title {
+		text-align: center;
+		font-size: 16px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 1px;
+		margin: 0 0 24px;
+	}
+
+	.section {
+		margin-bottom: 20px;
+	}
+
+	.section__heading {
+		font-size: 12px;
+		font-weight: 700;
+		text-transform: uppercase;
+		color: var(--color-accent);
+		border-bottom: 1px solid var(--color-border);
+		padding-bottom: 4px;
+		margin-bottom: 10px;
+	}
+
+	.data-grid {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 6px 24px;
+	}
+
+	.data-grid__item {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.data-grid__label {
+		font-size: 10px;
+		text-transform: uppercase;
+		color: var(--color-muted);
+	}
+
+	.data-grid__value {
+		font-weight: 600;
+	}
+
+	p.legal {
+		text-align: justify;
+		margin: 0 0 10px;
+	}
+
+	.signatures {
+		display: flex;
+		justify-content: space-between;
+		gap: 48px;
+		margin-top: 64px;
+	}
+
+	.signature {
+		flex: 1;
+		text-align: center;
+		border-top: 1px solid var(--color-text);
+		padding-top: 6px;
+		font-size: 11px;
+	}
+</style>
+
+<div class="report-header">
+    <div class="report-header__brand">@Model.Lender.Name</div>
+    <div class="report-header__meta">
+        <div><strong>Contrato N.º:</strong> @Model.ContractNumber</div>
+        <div><strong>Fecha de emisión:</strong> @Date(Model.IssueDate)</div>
+    </div>
+</div>
+
+<h1 class="report-title">Contrato de Préstamo</h1>
+
+<div class="section">
+    <div class="section__heading">Datos del Cliente</div>
+    <div class="data-grid">
+        <div class="data-grid__item">
+            <span class="data-grid__label">Nombre completo</span>
+            <span class="data-grid__value">@Model.Borrower.FullName</span>
+        </div>
+        <div class="data-grid__item">
+            <span class="data-grid__label">Identificación</span>
+            <span class="data-grid__value">@Model.Borrower.Identification</span>
+        </div>
+        <div class="data-grid__item">
+            <span class="data-grid__label">Teléfono</span>
+            <span class="data-grid__value">@Model.Borrower.PhoneNumber</span>
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <div class="section__heading">Condiciones del Préstamo</div>
+    <div class="data-grid">
+        <div class="data-grid__item">
+            <span class="data-grid__label">Monto del capital</span>
+            <span class="data-grid__value">@Money(Model.Terms.Principal)</span>
+        </div>
+        <div class="data-grid__item">
+            <span class="data-grid__label">Tasa de interés mensual</span>
+            <span class="data-grid__value">@ratePercent %</span>
+        </div>
+        <div class="data-grid__item">
+            <span class="data-grid__label">Plazo</span>
+            <span class="data-grid__value">@Model.Terms.TermMonths meses</span>
+        </div>
+        <div class="data-grid__item">
+            <span class="data-grid__label">Interés estimado del primer período</span>
+            <span class="data-grid__value">@Money(Model.Terms.EstimatedMonthlyInterest)</span>
+        </div>
+        <div class="data-grid__item">
+            <span class="data-grid__label">Fecha de inicio</span>
+            <span class="data-grid__value">@Date(Model.Terms.StartDate)</span>
+        </div>
+        <div class="data-grid__item">
+            <span class="data-grid__label">Fecha estimada de finalización</span>
+            <span class="data-grid__value">@Date(Model.Terms.EndDate)</span>
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <div class="section__heading">Cláusulas</div>
+    <p class="legal">
+        Por medio del presente documento, <strong>@Model.Lender.Name</strong> (en adelante, "el Acreedor")
+        otorga a <strong>@Model.Borrower.FullName</strong> (en adelante, "el Deudor") un préstamo por la suma
+        de <strong>@Money(Model.Terms.Principal)</strong>, que el Deudor se compromete a pagar en un plazo de
+        @Model.Terms.TermMonths meses, contados a partir del @Date(Model.Terms.StartDate).
+    </p>
+    <p class="legal">
+        El préstamo devengará un interés mensual del @ratePercent % sobre el saldo de capital vigente. Los pagos
+        deberán realizarse de forma puntual según las fechas establecidas. El incumplimiento de las obligaciones
+        aquí descritas facultará al Acreedor a ejercer las acciones de cobro que correspondan conforme a la ley.
+    </p>
+    <p class="legal">
+        Ambas partes declaran haber leído y aceptado las condiciones del presente contrato, firmándolo en señal
+        de conformidad.
+    </p>
+</div>
+
+<div class="signatures">
+    <div class="signature">@Model.Lender.Name<br />Acreedor</div>
+    <div class="signature">@Model.Borrower.FullName<br />Deudor</div>
+</div>

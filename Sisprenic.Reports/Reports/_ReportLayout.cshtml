@@ -1,0 +1,37 @@
+@using System.Globalization
+@{
+    // Base layout reused by ALL PDF reports.
+    //
+    // CSS is embedded in a <style> block (no external files) because the HTML is injected into
+    // Playwright via SetContentAsync without a base URL; this keeps the document 100% self-contained
+    // and independent from wwwroot or any resource served by the app.
+	var culture = CultureInfo.GetCultureInfo("es-NI");
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <style>
+        :root {
+            --color-text: #1f2933;
+            --color-muted: #647280;
+            --color-accent: #1d4ed8;
+            --color-border: #d8dee5;
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            color: var(--color-text);
+            font-family: "Segoe UI", Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    @RenderBody()
+</body>
+</html>
