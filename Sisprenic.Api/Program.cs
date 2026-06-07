@@ -11,6 +11,7 @@ using Sisprenic.Api.Extensions;
 
 using Sisprenic.Api.Authorization;
 using Sisprenic.Api.Modules.Clients.CreateClient;
+using Sisprenic.Api.Modules.Clients.UpdateClient;
 using Sisprenic.Api.Modules.Loans.CreateLoan;
 using Sisprenic.Api.Modules.Loans.UpdateLoan;
 using Sisprenic.Api.Modules.Payments.CreatePayment;
@@ -67,6 +68,7 @@ try
     // Validators
     builder.Services.AddScoped<IValidator<CreatePaymentRequest>, CreatePaymentValidator>();
     builder.Services.AddScoped<IValidator<CreateClientRequest>, CreateClientValidator>();
+    builder.Services.AddScoped<IValidator<UpdateClientRequest>, UpdateClientValidator>();
     builder.Services.AddScoped<IValidator<CreateLoanRequest>, CreateLoanValidator>();
     builder.Services.AddScoped<IValidator<UpdateLoanRequest>, UpdateLoanValidator>();
 
