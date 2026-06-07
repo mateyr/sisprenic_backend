@@ -1,3 +1,6 @@
+using FluentValidation;
+using FluentValidation.Results;
+
 using Sisprenic.Api.Database;
 using Sisprenic.Api.Entities;
 
@@ -10,8 +13,18 @@ public static class CreateClientEndpoint
         group.MapPost("/", Handle);
     }
 
-    private static async Task<IResult> Handle(CreateClientRequest request, SisprenicContext dbContext)
+    private static async Task<IResult> Handle(
+        IValidator<CreateClientRequest> validator,
+        CreateClientRequest request,
+        SisprenicContext dbContext)
     {
+        ValidationResult validationResult = await validator.ValidateAsync(request);
+
+        if (!validationResult.IsValid)
+        {
+            return Results.ValidationProblem(validationResult.ToDictionary());
+        }
+
         Client client = new()
         {
             FirstName = request.FirstName,

@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 using Microsoft.EntityFrameworkCore;
 
 using Sisprenic.Api.Database;
@@ -16,7 +18,7 @@ public static class GetLoanContractEndpoint
     }
 
     private static async Task<IResult> Handle(
-        int id,
+        [Range(1, int.MaxValue)] int id,
         SisprenicContext dbContext,
         IReportRenderer reportRenderer,
         CancellationToken cancellationToken)
