@@ -25,11 +25,22 @@ namespace Sisprenic.Api.Configurations
             builder.Property(c => c.PhoneNumber).IsRequired().HasMaxLength(30);
 
             // Unique constraint for identification
-            builder.HasIndex(c => c.Identification).IsUnique();
+            builder.HasIndex(c => c.Identification)
+                .IsUnique()
+                .HasFilter("is_deleted = false");
 
             builder.HasMany(c => c.Loans)
                 .WithOne(c => c.Client)
                 .HasForeignKey(c => c.ClientId);
+
+            builder.Property(c => c.IsDeleted).HasDefaultValue(false).IsRequired();
+            builder.Property(c => c.DeletedOn).IsRequired(false);
+
+            builder.HasQueryFilter(c => !c.IsDeleted);
+
+            builder.HasIndex(c => c.IsDeleted)
+                .HasFilter("is_deleted = false")
+                .HasDatabaseName("ix_client_is_deleted");
         }
     }
 }
