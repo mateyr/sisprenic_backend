@@ -9,7 +9,7 @@ public static class DeleteClientEndpoint
 {
     public static void MapDeleteClient(this RouteGroupBuilder group)
     {
-        group.MapDelete("/{id}", Handle);
+        group.MapDelete("/{id}", Handle).RequireAuthorization("clients:delete");
     }
 
     private static async Task<IResult> Handle(int id, SisprenicContext dbContext)

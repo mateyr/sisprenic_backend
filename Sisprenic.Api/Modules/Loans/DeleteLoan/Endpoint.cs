@@ -10,7 +10,7 @@ public static class DeleteLoanEndpoint
 {
     public static void MapDeleteLoan(this RouteGroupBuilder group)
     {
-        group.MapDelete("/{id}", Handle);
+        group.MapDelete("/{id}", Handle).RequireAuthorization("loans:delete");
     }
 
     private static async Task<IResult> Handle(int id, SisprenicContext dbContext)

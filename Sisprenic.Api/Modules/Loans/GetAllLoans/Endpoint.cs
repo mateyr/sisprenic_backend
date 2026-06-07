@@ -10,7 +10,7 @@ public static class GetAllLoansEndpoint
 {
     public static void MapGetAllLoans(this RouteGroupBuilder group)
     {
-        group.MapGet("/", Handle);
+        group.MapGet("/", Handle).RequireAuthorization("loans:read");
     }
 
     private static async Task<IResult> Handle(SisprenicContext dbContext)

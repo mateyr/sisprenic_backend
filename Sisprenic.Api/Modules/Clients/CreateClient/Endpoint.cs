@@ -10,7 +10,7 @@ public static class CreateClientEndpoint
 {
     public static void MapCreateClient(this RouteGroupBuilder group)
     {
-        group.MapPost("/", Handle);
+        group.MapPost("/", Handle).RequireAuthorization("clients:create");
     }
 
     private static async Task<IResult> Handle(

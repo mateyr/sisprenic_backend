@@ -11,7 +11,7 @@ public static class GetCurrentUserEndpoint
 {
     public static void MapGetCurrentUser(this RouteGroupBuilder group)
     {
-        group.MapGet("/me", Handle);
+        group.MapGet("/me", Handle).RequireAuthorization();
     }
 
     private static async Task<IResult> Handle(

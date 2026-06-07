@@ -14,7 +14,7 @@ public static class GetLoanContractEndpoint
 {
     public static void MapGetLoanContract(this RouteGroupBuilder group)
     {
-        group.MapGet("/{id}/contract", Handle);
+        group.MapGet("/{id}/contract", Handle).RequireAuthorization("loans:read");
     }
 
     private static async Task<IResult> Handle(

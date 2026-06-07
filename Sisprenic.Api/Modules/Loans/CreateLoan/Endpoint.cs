@@ -13,7 +13,7 @@ public static class CreateLoanEndpoint
 {
     public static void MapCreateLoan(this RouteGroupBuilder group)
     {
-        group.MapPost("/", Handle);
+        group.MapPost("/", Handle).RequireAuthorization("loans:create");
     }
 
     private static async Task<IResult> Handle(

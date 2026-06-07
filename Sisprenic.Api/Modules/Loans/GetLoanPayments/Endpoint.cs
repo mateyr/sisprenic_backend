@@ -8,7 +8,7 @@ public static class GetLoanPaymentsEndpoint
 {
     public static void MapGetLoanPayments(this RouteGroupBuilder group)
     {
-        group.MapGet("/{id}/payments", Handle);
+        group.MapGet("/{id}/payments", Handle).RequireAuthorization("loans:read");
     }
 
     private static async Task<IResult> Handle(int id, SisprenicContext dbContext)

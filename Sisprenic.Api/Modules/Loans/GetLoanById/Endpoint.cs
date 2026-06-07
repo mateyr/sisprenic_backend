@@ -11,7 +11,7 @@ public static class GetLoanByIdEndpoint
 {
     public static void MapGetLoanById(this RouteGroupBuilder group)
     {
-        group.MapGet("/{id}", Handle);
+        group.MapGet("/{id}", Handle).RequireAuthorization("loans:read");
     }
 
     private static async Task<IResult> Handle(int id, SisprenicContext dbContext)

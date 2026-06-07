@@ -13,7 +13,7 @@ public static class UpdateLoanEndpoint
 {
     public static void MapUpdateLoan(this RouteGroupBuilder group)
     {
-        group.MapPatch("/{id}", Handle);
+        group.MapPatch("/{id}", Handle).RequireAuthorization("loans:update");
     }
 
     private static async Task<IResult> Handle(

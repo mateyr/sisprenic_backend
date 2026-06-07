@@ -10,7 +10,7 @@ public static class UpdateClientEndpoint
 {
     public static void MapUpdateClient(this RouteGroupBuilder group)
     {
-        group.MapPatch("/{id}", Handle);
+        group.MapPatch("/{id}", Handle).RequireAuthorization("clients:update");
     }
 
     private static async Task<IResult> Handle(
