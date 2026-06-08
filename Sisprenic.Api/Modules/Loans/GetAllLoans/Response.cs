@@ -8,5 +8,6 @@ public record GetAllLoansResponse(
     decimal InterestRate,
     int TermMonths,
     DateOnly StartDate,
+    string Status,
     ClientSummaryResponse Client
 );

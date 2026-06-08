@@ -31,6 +31,7 @@ public static class GetLoanByIdEndpoint
             loan.InterestRate,
             loan.TermMonths,
             loan.StartDate,
+            loan.Status.ToDisplayName(),
             new ClientSummaryResponse(
                 loan.Client.Id,
                 loan.Client.FirstName,

@@ -93,7 +93,18 @@ public static class CreatePaymentHandler
             Loan = null!
         };
 
+        decimal remainingPrincipal = summary.PrincipalCurrent - principalApplied;
+        decimal remainingInterest = totalInterestOutstanding - interestApplied;
+
+        bool isPaid = remainingPrincipal == 0 && remainingInterest == 0;
+
+        if (isPaid)
+        {
+            loan.Status = LoanStatus.Paid;
+        }
+
         dbContext.Payment.Add(payment);
+
         await dbContext.SaveChangesAsync();
 
         return CreatePaymentResult.Success(payment, message);

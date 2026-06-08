@@ -37,6 +37,16 @@ public class LoanConfiguration : IEntityTypeConfiguration<Loan>
             .HasForeignKey(l => l.ClientId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.Property(l => l.Status)
+            .IsRequired()
+            .HasDefaultValue(LoanStatus.Active)
+            .HasComment("Estado del préstamo: 0 = Activo, 1 = Pagado");
+
+        builder.ToTable(t =>
+            t.HasCheckConstraint(
+                "CK_Loan_ValidStatus",
+                "status IN (0, 1)"));
+
         builder.Property(l => l.IsDeleted).HasDefaultValue(false).IsRequired();
         builder.Property(l => l.DeletedOn).IsRequired(false);
 

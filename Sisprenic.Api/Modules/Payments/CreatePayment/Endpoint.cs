@@ -30,9 +30,7 @@ public static class CreatePaymentEndpoint
             return Results.ValidationProblem(validationResult.ToDictionary());
         }
 
-        Loan? loan = await dbContext.Loan
-            .AsNoTracking()
-            .FirstOrDefaultAsync(l => l.Id == request.LoanId);
+        Loan? loan = await dbContext.Loan.FirstOrDefaultAsync(l => l.Id == request.LoanId);
 
         if (loan is null)
         {

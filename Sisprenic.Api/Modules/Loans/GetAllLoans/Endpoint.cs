@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 using Sisprenic.Api.Database;
 
+using Sisprenic.Api.Entities;
 using Sisprenic.Api.Modules.Loans.Shared;
 
 namespace Sisprenic.Api.Modules.Loans.GetAllLoans;
@@ -16,14 +17,15 @@ public static class GetAllLoansEndpoint
     private static async Task<IResult> Handle(SisprenicContext dbContext)
     {
         List<GetAllLoansResponse> loans = await dbContext.Loan
-            .Include(l => l.Client)
             .AsNoTracking()
+            .Include(l => l.Client)
             .Select(l => new GetAllLoansResponse(
                 l.Id,
                 l.Principal,
                 l.InterestRate,
                 l.TermMonths,
                 l.StartDate,
+                l.Status.ToDisplayName(),
                 new ClientSummaryResponse(
                     l.Client.Id,
                     l.Client.FirstName,

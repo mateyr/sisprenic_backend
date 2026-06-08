@@ -15,6 +15,8 @@ public class Loan : ISoftDeletable
 
     public ICollection<Payment> Payments { get; set; } = new List<Payment>();
 
+    public LoanStatus Status { get; set; } = LoanStatus.Active;
+
     public bool IsDeleted { get; set; }
     public DateTime? DeletedOn { get; set; }
 }
