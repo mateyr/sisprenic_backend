@@ -21,16 +21,17 @@ public static class CreatePaymentEndpoint
     private static async Task<IResult> Handle(
         IValidator<CreatePaymentRequest> validator,
         CreatePaymentRequest request,
-        SisprenicContext dbContext)
+        SisprenicContext dbContext,
+        CancellationToken cancellationToken)
     {
-        ValidationResult validationResult = await validator.ValidateAsync(request);
+        ValidationResult validationResult = await validator.ValidateAsync(request, cancellationToken);
 
         if (!validationResult.IsValid)
         {
             return Results.ValidationProblem(validationResult.ToDictionary());
         }
 
-        Loan? loan = await dbContext.Loan.FirstOrDefaultAsync(l => l.Id == request.LoanId);
+        Loan? loan = await dbContext.Loan.FirstOrDefaultAsync(l => l.Id == request.LoanId, cancellationToken);
 
         if (loan is null)
         {
@@ -41,7 +42,7 @@ public static class CreatePaymentEndpoint
                 });
         }
 
-        CreatePaymentResult result = await CreatePaymentHandler.Execute(loan, request, dbContext);
+        CreatePaymentResult result = await CreatePaymentHandler.Execute(loan, request, dbContext, cancellationToken);
 
         if (!result.IsSuccess)
         {

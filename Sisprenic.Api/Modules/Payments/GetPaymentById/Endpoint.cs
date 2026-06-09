@@ -13,7 +13,10 @@ public static class GetPaymentByIdEndpoint
         group.MapGet("/{id}", Handle).RequireAuthorization("payments:read");
     }
 
-    private static async Task<IResult> Handle(int id, SisprenicContext dbContext)
+    private static async Task<IResult> Handle(
+        int id,
+        SisprenicContext dbContext,
+        CancellationToken cancellationToken)
     {
         PaymentResponse? payment = await dbContext.Payment
             .AsNoTracking()
@@ -25,7 +28,7 @@ public static class GetPaymentByIdEndpoint
                 p.PaymentDay,
                 p.Note,
                 p.LoanId))
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
 
         return payment is null ? TypedResults.NotFound() : TypedResults.Ok(payment);
     }

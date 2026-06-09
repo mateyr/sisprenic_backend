@@ -11,7 +11,9 @@ public static class GetAllClientsEndpoint
         group.MapGet("/", Handle).RequireAuthorization("clients:read");
     }
 
-    private static async Task<IResult> Handle(SisprenicContext dbContext)
+    private static async Task<IResult> Handle(
+        SisprenicContext dbContext,
+        CancellationToken cancellationToken)
     {
         List<GetAllClientsResponse> clients = await dbContext.Client
             .AsNoTracking()
@@ -23,7 +25,7 @@ public static class GetAllClientsEndpoint
                 c.SecondLastName,
                 c.Identification,
                 c.PhoneNumber))
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         return TypedResults.Ok(clients);
     }

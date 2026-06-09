@@ -14,12 +14,15 @@ public static class DeletePaymentEndpoint
         group.MapDelete("/{id}", Handle).RequireAuthorization("payments:delete");
     }
 
-    private static async Task<IResult> Handle(int id, SisprenicContext dbContext)
+    private static async Task<IResult> Handle(
+        int id,
+        SisprenicContext dbContext,
+        CancellationToken cancellationToken)
     {
-        Payment? payment = await dbContext.Payment.FindAsync(id);
+        Payment? payment = await dbContext.Payment.FindAsync([id], cancellationToken);
         if (payment is null) return TypedResults.NotFound();
 
-        Loan? loan = await dbContext.Loan.FindAsync(payment.LoanId);
+        Loan? loan = await dbContext.Loan.FindAsync([payment.LoanId], cancellationToken);
 
         if (loan is not null && loan.Status == LoanStatus.Paid)
         {
@@ -31,7 +34,7 @@ public static class DeletePaymentEndpoint
                          && p.Id != id
                          && p.PaymentDay >= loan.StartDate
                          && p.PaymentDay <= today)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             LoanSummaryDto summary = LoanSummaryService.Calculate(loan, remainingPayments, today);
 
@@ -48,7 +51,7 @@ public static class DeletePaymentEndpoint
 
         dbContext.Payment.Remove(payment);
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         return TypedResults.NoContent();
     }

@@ -17,16 +17,17 @@ public static class UpdateClientEndpoint
         int id,
         IValidator<UpdateClientRequest> validator,
         UpdateClientRequest request,
-        SisprenicContext dbContext)
+        SisprenicContext dbContext,
+        CancellationToken cancellationToken)
     {
-        ValidationResult validationResult = await validator.ValidateAsync(request);
+        ValidationResult validationResult = await validator.ValidateAsync(request, cancellationToken);
 
         if (!validationResult.IsValid)
         {
             return Results.ValidationProblem(validationResult.ToDictionary());
         }
 
-        Client? client = await dbContext.Client.FindAsync(id);
+        Client? client = await dbContext.Client.FindAsync([id], cancellationToken);
         if (client is null)
             return TypedResults.NotFound();
 
@@ -37,7 +38,7 @@ public static class UpdateClientEndpoint
         if (request.Identification is not null)  client.Identification = request.Identification;
         if (request.PhoneNumber is not null)     client.PhoneNumber = request.PhoneNumber;
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         return TypedResults.NoContent();
     }

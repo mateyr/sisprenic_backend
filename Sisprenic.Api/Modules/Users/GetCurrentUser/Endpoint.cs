@@ -16,7 +16,8 @@ public static class GetCurrentUserEndpoint
 
     private static async Task<IResult> Handle(
         ClaimsPrincipal claimsPrincipal,
-        SisprenicContext db)
+        SisprenicContext db,
+        CancellationToken cancellationToken)
     {
         string userId = claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier)!;
         string email = claimsPrincipal.FindFirstValue(ClaimTypes.Email)!;
@@ -31,7 +32,7 @@ public static class GetCurrentUserEndpoint
             .OrderBy(menu => menu.SectionOrder)
             .ThenBy(menu => menu.Order)
             .AsNoTracking()
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         List<MenuItemDto> menu = BuildMenuTree(flatMenu);
 

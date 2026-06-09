@@ -11,9 +11,12 @@ public static class GetLoanPaymentsEndpoint
         group.MapGet("/{id}/payments", Handle).RequireAuthorization("loans:read");
     }
 
-    private static async Task<IResult> Handle(int id, SisprenicContext dbContext)
+    private static async Task<IResult> Handle(
+        int id,
+        SisprenicContext dbContext,
+        CancellationToken cancellationToken)
     {
-        bool loanExists = await dbContext.Loan.AnyAsync(l => l.Id == id);
+        bool loanExists = await dbContext.Loan.AnyAsync(l => l.Id == id, cancellationToken);
 
         if (!loanExists)
         {
@@ -30,7 +33,7 @@ public static class GetLoanPaymentsEndpoint
                 p.Interest,
                 p.PaymentDay,
                 p.Note))
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         return TypedResults.Ok(payments);
     }

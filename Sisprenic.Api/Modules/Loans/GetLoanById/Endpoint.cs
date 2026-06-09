@@ -14,16 +14,19 @@ public static class GetLoanByIdEndpoint
         group.MapGet("/{id}", Handle).RequireAuthorization("loans:read");
     }
 
-    private static async Task<IResult> Handle(int id, SisprenicContext dbContext)
+    private static async Task<IResult> Handle(
+        int id,
+        SisprenicContext dbContext,
+        CancellationToken cancellationToken)
     {
         Loan? loan = await dbContext.Loan
             .Include(l => l.Client)
             .AsNoTracking()
-            .FirstOrDefaultAsync(l => l.Id == id);
+            .FirstOrDefaultAsync(l => l.Id == id, cancellationToken);
 
         if (loan is null) return TypedResults.NotFound();
 
-        LoanSummaryDto summary = await LoanSummaryService.CalculateAsync(loan, dbContext);
+        LoanSummaryDto summary = await LoanSummaryService.CalculateAsync(loan, dbContext, cancellationToken);
 
         GetLoanByIdResponse response = new(
             loan.Id,

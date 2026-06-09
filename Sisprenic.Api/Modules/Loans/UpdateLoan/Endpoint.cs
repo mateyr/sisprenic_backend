@@ -20,19 +20,20 @@ public static class UpdateLoanEndpoint
         int id,
         IValidator<UpdateLoanRequest> validator,
         UpdateLoanRequest request,
-        SisprenicContext dbContext)
+        SisprenicContext dbContext,
+        CancellationToken cancellationToken)
     {
-        ValidationResult validationResult = await validator.ValidateAsync(request);
+        ValidationResult validationResult = await validator.ValidateAsync(request, cancellationToken);
 
         if (!validationResult.IsValid)
         {
             return Results.ValidationProblem(validationResult.ToDictionary());
         }
 
-        Loan? loan = await dbContext.Loan.FindAsync(id);
+        Loan? loan = await dbContext.Loan.FindAsync([id], cancellationToken);
         if (loan is null) return TypedResults.NotFound();
 
-        bool hasPayments = await dbContext.Payment.AnyAsync(p => p.LoanId == id);
+        bool hasPayments = await dbContext.Payment.AnyAsync(p => p.LoanId == id, cancellationToken);
 
         if (hasPayments)
         {
@@ -51,7 +52,7 @@ public static class UpdateLoanEndpoint
 
         if (request.ClientId.HasValue && loan.ClientId != request.ClientId.Value)
         {
-            bool clientExists = await dbContext.Client.AnyAsync(c => c.Id == request.ClientId.Value);
+            bool clientExists = await dbContext.Client.AnyAsync(c => c.Id == request.ClientId.Value, cancellationToken);
             if (!clientExists)
                 return Results.ValidationProblem(new Dictionary<string, string[]>
                 {
@@ -65,7 +66,7 @@ public static class UpdateLoanEndpoint
         if (request.StartDate.HasValue)    loan.StartDate    = request.StartDate.Value;
         if (request.ClientId.HasValue)     loan.ClientId     = request.ClientId.Value;
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
         return TypedResults.NoContent();
     }
 }
