@@ -7,13 +7,29 @@ namespace Sisprenic.Api.Database;
 
 public sealed class SoftDeleteInterceptor : SaveChangesInterceptor
 {
+    public override InterceptionResult<int> SavingChanges(
+        DbContextEventData eventData,
+        InterceptionResult<int> result)
+    {
+        ConvertHardDeletesToSoftDeletes(eventData);
+
+        return base.SavingChanges(eventData, result);
+    }
+
     public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
         DbContextEventData eventData,
         InterceptionResult<int> result,
         CancellationToken cancellationToken = default)
     {
+        ConvertHardDeletesToSoftDeletes(eventData);
+
+        return base.SavingChangesAsync(eventData, result, cancellationToken);
+    }
+
+    private static void ConvertHardDeletesToSoftDeletes(DbContextEventData eventData)
+    {
         if (eventData.Context is null)
-            return base.SavingChangesAsync(eventData, result, cancellationToken);
+            return;
 
         var entries = eventData.Context
             .ChangeTracker
@@ -26,7 +42,5 @@ public sealed class SoftDeleteInterceptor : SaveChangesInterceptor
             entry.Entity.IsDeleted = true;
             entry.Entity.DeletedOn = DateTime.UtcNow;
         }
-
-        return base.SavingChangesAsync(eventData, result, cancellationToken);
     }
 }
