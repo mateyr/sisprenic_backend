@@ -17,9 +17,10 @@ public static class CreateClientEndpoint
     private static async Task<IResult> Handle(
         IValidator<CreateClientRequest> validator,
         CreateClientRequest request,
-        SisprenicContext dbContext)
+        SisprenicContext dbContext,
+        CancellationToken cancellationToken)
     {
-        ValidationResult validationResult = await validator.ValidateAsync(request);
+        ValidationResult validationResult = await validator.ValidateAsync(request, cancellationToken);
 
         if (!validationResult.IsValid)
         {
@@ -37,7 +38,7 @@ public static class CreateClientEndpoint
         };
 
         dbContext.Client.Add(client);
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         return TypedResults.Created($"/clients/{client.Id}", client);
     }

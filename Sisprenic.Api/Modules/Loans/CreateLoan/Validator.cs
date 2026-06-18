@@ -13,7 +13,7 @@ public class CreateLoanValidator : AbstractValidator<CreateLoanRequest>
         RuleFor(x => x.InterestRate)
             .NotNull().WithMessage("La tasa de interés es requerida.")
             .GreaterThanOrEqualTo(0).WithMessage("La tasa de interés no puede ser negativa.")
-            .LessThanOrEqualTo(100).WithMessage("La tasa de interés no puede superar el 100%.");
+            .LessThanOrEqualTo(1).WithMessage("La tasa de interés no puede superar el 100%.");
 
         RuleFor(x => x.TermMonths)
             .NotNull().WithMessage("El plazo es requerida.")

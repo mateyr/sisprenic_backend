@@ -20,16 +20,17 @@ public static class CreateLoanEndpoint
     private static async Task<IResult> Handle(
         IValidator<CreateLoanRequest> validator,
         CreateLoanRequest request,
-        SisprenicContext dbContext)
+        SisprenicContext dbContext,
+        CancellationToken cancellationToken)
     {
-        ValidationResult validationResult = await validator.ValidateAsync(request);
+        ValidationResult validationResult = await validator.ValidateAsync(request, cancellationToken);
 
         if (!validationResult.IsValid)
         {
             return Results.ValidationProblem(validationResult.ToDictionary());
         }
 
-        bool clientExists = await dbContext.Client.AnyAsync(c => c.Id == request.ClientId);
+        bool clientExists = await dbContext.Client.AnyAsync(c => c.Id == request.ClientId, cancellationToken);
         if (!clientExists)
         {
             return Results.ValidationProblem(
@@ -50,7 +51,7 @@ public static class CreateLoanEndpoint
         };
 
         dbContext.Loan.Add(loan);
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
         return TypedResults.Created($"/loans/{loan.Id}", loan);
     }
 }

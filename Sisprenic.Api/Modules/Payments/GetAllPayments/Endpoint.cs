@@ -14,7 +14,9 @@ public static class GetAllPaymentsEndpoint
         group.MapGet("/", Handle).RequireAuthorization(Permissions.Payments.Read);
     }
 
-    private static async Task<IResult> Handle(SisprenicContext dbContext)
+    private static async Task<IResult> Handle(
+        SisprenicContext dbContext,
+        CancellationToken cancellationToken)
     {
         List<PaymentResponse> payments = await dbContext.Payment
             .AsNoTracking()
@@ -25,7 +27,7 @@ public static class GetAllPaymentsEndpoint
                 p.PaymentDay,
                 p.Note,
                 p.LoanId))
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         return TypedResults.Ok(payments);
     }

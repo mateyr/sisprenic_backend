@@ -13,7 +13,10 @@ namespace Sisprenic.Api.Modules.Loans.Shared;
 // valorar persistir un snapshot del estado al momento de cada pago y usarlo para el resumen.
 public static class LoanSummaryService
 {
-    public static async Task<LoanSummaryDto> CalculateAsync(Loan loan, SisprenicContext dbContext)
+    public static async Task<LoanSummaryDto> CalculateAsync(
+        Loan loan,
+        SisprenicContext dbContext,
+        CancellationToken cancellationToken = default)
     {
         DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
 
@@ -22,7 +25,7 @@ public static class LoanSummaryService
             .Where(p => p.LoanId == loan.Id
                      && p.PaymentDay >= loan.StartDate
                      && p.PaymentDay <= today)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         return Calculate(loan, payments, today);
     }

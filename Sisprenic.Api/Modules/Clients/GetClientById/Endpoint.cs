@@ -12,7 +12,10 @@ public static class GetClientByIdEndpoint
         group.MapGet("/{id}", Handle).RequireAuthorization(Permissions.Clients.Read);
     }
 
-    private static async Task<IResult> Handle(int id, SisprenicContext dbContext)
+    private static async Task<IResult> Handle(
+        int id,
+        SisprenicContext dbContext,
+        CancellationToken cancellationToken)
     {
         GetClientByIdResponse? client = await dbContext.Client
             .AsNoTracking()
@@ -33,7 +36,7 @@ public static class GetClientByIdEndpoint
                         l.TermMonths,
                         l.StartDate))
                     .ToList()))
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
 
         return client is null ? TypedResults.NotFound() : TypedResults.Ok(client);
     }

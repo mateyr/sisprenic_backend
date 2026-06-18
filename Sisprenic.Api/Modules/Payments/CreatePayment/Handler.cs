@@ -28,7 +28,8 @@ public static class CreatePaymentHandler
     public static async Task<CreatePaymentResult> Execute(
         Loan loan,
         CreatePaymentRequest request,
-        SisprenicContext dbContext)
+        SisprenicContext dbContext,
+        CancellationToken cancellationToken = default)
     {
         if (request.PaymentDay < loan.StartDate)
         {
@@ -44,7 +45,7 @@ public static class CreatePaymentHandler
                 p.LoanId == request.LoanId
                 && p.PaymentDay >= loan.StartDate
                 && p.PaymentDay <= request.PaymentDay)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         LoanSummaryDto summary = LoanSummaryService.Calculate(loan, payments, request.PaymentDay);
 
@@ -105,7 +106,7 @@ public static class CreatePaymentHandler
 
         dbContext.Payment.Add(payment);
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         return CreatePaymentResult.Success(payment, message);
     }

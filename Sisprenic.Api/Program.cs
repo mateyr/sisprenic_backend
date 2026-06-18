@@ -64,6 +64,7 @@ try
     });
 
     builder.Services.AddValidation();
+    builder.Services.AddGlobalExceptionHandling();
 
     // Validators
     builder.Services.AddScoped<IValidator<CreatePaymentRequest>, CreatePaymentValidator>();
@@ -77,6 +78,7 @@ try
     var app = builder.Build();
 
     app.UseSerilogRequestLogging();
+    app.UseGlobalExceptionHandling();
 
     app.MapIdentityApi<IdentityUser>().WithTags("Authentication");
 

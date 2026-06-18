@@ -15,7 +15,9 @@ public static class GetAllLoansEndpoint
         group.MapGet("/", Handle).RequireAuthorization(Permissions.Loans.Read);
     }
 
-    private static async Task<IResult> Handle(SisprenicContext dbContext)
+    private static async Task<IResult> Handle(
+        SisprenicContext dbContext,
+        CancellationToken cancellationToken)
     {
         List<GetAllLoansResponse> loans = await dbContext.Loan
             .AsNoTracking()
@@ -35,7 +37,7 @@ public static class GetAllLoansEndpoint
                     l.Client.SecondLastName,
                     l.Client.Identification,
                     l.Client.PhoneNumber)))
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         return TypedResults.Ok(loans);
     }

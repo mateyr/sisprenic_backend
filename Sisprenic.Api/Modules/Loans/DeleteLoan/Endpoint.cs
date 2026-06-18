@@ -14,12 +14,15 @@ public static class DeleteLoanEndpoint
         group.MapDelete("/{id}", Handle).RequireAuthorization(Permissions.Loans.Delete);
     }
 
-    private static async Task<IResult> Handle(int id, SisprenicContext dbContext)
+    private static async Task<IResult> Handle(
+        int id,
+        SisprenicContext dbContext,
+        CancellationToken cancellationToken)
     {
-        Loan? loan = await dbContext.Loan.FindAsync(id);
+        Loan? loan = await dbContext.Loan.FindAsync([id], cancellationToken);
         if (loan is null) return TypedResults.NotFound();
 
-        bool hasPayments = await dbContext.Payment.AnyAsync(p => p.LoanId == id);
+        bool hasPayments = await dbContext.Payment.AnyAsync(p => p.LoanId == id, cancellationToken);
         if (hasPayments)
         {
             return Results.ValidationProblem(
@@ -30,7 +33,7 @@ public static class DeleteLoanEndpoint
         }
 
         dbContext.Loan.Remove(loan);
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
         return TypedResults.NoContent();
     }
 }

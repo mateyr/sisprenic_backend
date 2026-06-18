@@ -13,13 +13,16 @@ public static class DeleteClientEndpoint
         group.MapDelete("/{id}", Handle).RequireAuthorization(Permissions.Clients.Delete);
     }
 
-    private static async Task<IResult> Handle(int id, SisprenicContext dbContext)
+    private static async Task<IResult> Handle(
+        int id,
+        SisprenicContext dbContext,
+        CancellationToken cancellationToken)
     {
-        Client? client = await dbContext.Client.FindAsync(id);
+        Client? client = await dbContext.Client.FindAsync([id], cancellationToken);
         if (client is null)
             return TypedResults.NotFound();
 
-        bool hasLoans = await dbContext.Loan.AnyAsync(p => p.ClientId == id);
+        bool hasLoans = await dbContext.Loan.AnyAsync(p => p.ClientId == id, cancellationToken);
 
         if (hasLoans)
         {
@@ -31,7 +34,7 @@ public static class DeleteClientEndpoint
         }
 
         dbContext.Client.Remove(client);
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         return TypedResults.NoContent();
     }
