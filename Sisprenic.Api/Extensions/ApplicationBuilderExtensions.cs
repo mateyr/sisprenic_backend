@@ -44,7 +44,8 @@ public static class ApplicationBuilderExtensions
         using var scope = app.Services.CreateScope();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
         var dbContext = scope.ServiceProvider.GetRequiredService<SisprenicContext>();
-        await AdminSeeder.SeedAsync(userManager, dbContext);
+        var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+        await AdminSeeder.SeedAsync(userManager, dbContext, configuration);
     }
 
     public static void MapEndpoints(this WebApplication app)

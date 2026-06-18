@@ -9,22 +9,28 @@ namespace Sisprenic.Api.Database;
 
 public static class AdminSeeder
 {
-    private const string AdminEmail = "admin@sisprenic.com";
-    private const string AdminPassword = "Admin123*";
-
     public static async Task SeedAsync(
         UserManager<IdentityUser> userManager,
         SisprenicContext context,
+        IConfiguration configuration,
         CancellationToken cancellationToken = default)
     {
-        IdentityUser admin = await EnsureAdminUserAsync(userManager);
+        string adminEmail = configuration["AdminUser:Email"]
+            ?? throw new InvalidOperationException("Missing configuration value 'AdminUser:Email'.");
+        string adminPassword = configuration["AdminUser:Password"]
+            ?? throw new InvalidOperationException("Missing configuration value 'AdminUser:Password'.");
+
+        IdentityUser admin = await EnsureAdminUserAsync(userManager, adminEmail, adminPassword);
 
         await EnsureAdminClaimsAsync(userManager, context, admin, cancellationToken);
     }
 
-    private static async Task<IdentityUser> EnsureAdminUserAsync(UserManager<IdentityUser> userManager)
+    private static async Task<IdentityUser> EnsureAdminUserAsync(
+        UserManager<IdentityUser> userManager,
+        string adminEmail,
+        string adminPassword)
     {
-        IdentityUser? existing = await userManager.FindByEmailAsync(AdminEmail);
+        IdentityUser? existing = await userManager.FindByEmailAsync(adminEmail);
         if (existing is not null)
         {
             return existing;
@@ -32,11 +38,11 @@ public static class AdminSeeder
 
         IdentityUser admin = new IdentityUser
         {
-            UserName = AdminEmail,
-            Email = AdminEmail
+            UserName = adminEmail,
+            Email = adminEmail
         };
 
-        IdentityResult result = await userManager.CreateAsync(admin, AdminPassword);
+        IdentityResult result = await userManager.CreateAsync(admin, adminPassword);
         if (!result.Succeeded)
         {
             string errors = string.Join(", ", result.Errors.Select(e => e.Description));
