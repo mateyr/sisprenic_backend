@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
+using Sisprenic.Api.Authorization;
 using Sisprenic.Api.Database;
 
 using Sisprenic.Api.Entities;
@@ -10,7 +11,7 @@ public static class DeleteLoanEndpoint
 {
     public static void MapDeleteLoan(this RouteGroupBuilder group)
     {
-        group.MapDelete("/{id}", Handle).RequireAuthorization("loans:delete");
+        group.MapDelete("/{id}", Handle).RequireAuthorization(Permissions.Loans.Delete);
     }
 
     private static async Task<IResult> Handle(int id, SisprenicContext dbContext)

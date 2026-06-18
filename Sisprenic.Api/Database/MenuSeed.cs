@@ -1,3 +1,4 @@
+using Sisprenic.Api.Authorization;
 using Sisprenic.Api.Entities;
 
 namespace Sisprenic.Api.Database;
@@ -14,7 +15,7 @@ public static class MenuSeed
             Order = 1,
             Section = "Operación",
             SectionOrder = 1,
-            RequiredClaim = "dashboard:read",
+            RequiredClaim = Permissions.Dashboard.Read,
         },
         new Menu
         {
@@ -24,7 +25,7 @@ public static class MenuSeed
             Order = 2,
             Section = "Operación",
             SectionOrder = 1,
-            RequiredClaim = "clients:read",
+            RequiredClaim = Permissions.Clients.Read,
         },
         new Menu
         {
@@ -34,7 +35,7 @@ public static class MenuSeed
             Order = 3,
             Section = "Operación",
             SectionOrder = 1,
-            RequiredClaim = "loans:read",
+            RequiredClaim = Permissions.Loans.Read,
         },
         new Menu
         {
@@ -44,7 +45,7 @@ public static class MenuSeed
             Order = 4,
             Section = "Operación",
             SectionOrder = 1,
-            RequiredClaim = "payments:read",
+            RequiredClaim = Permissions.Payments.Read,
         },
         new Menu
         {
@@ -54,7 +55,7 @@ public static class MenuSeed
             Order = 5,
             Section = "Operación",
             SectionOrder = 1,
-            RequiredClaim = "reports:read",
+            RequiredClaim = Permissions.Reports.Read,
         },
         new Menu
         {
@@ -64,7 +65,7 @@ public static class MenuSeed
             Order = 1,
             Section = "Seguridad",
             SectionOrder = 2,
-            RequiredClaim = "users:read",
+            RequiredClaim = Permissions.Users.Read,
         },
         new Menu
         {
@@ -74,7 +75,7 @@ public static class MenuSeed
             Order = 2,
             Section = "Seguridad",
             SectionOrder = 2,
-            RequiredClaim = "roles:read",
+            RequiredClaim = Permissions.Roles.Read,
         },
         new Menu
         {
@@ -84,7 +85,7 @@ public static class MenuSeed
             Order = 1,
             Section = "Configuración",
             SectionOrder = 3,
-            RequiredClaim = "settings:read",
+            RequiredClaim = Permissions.Settings.Read,
         },
     ];
 }

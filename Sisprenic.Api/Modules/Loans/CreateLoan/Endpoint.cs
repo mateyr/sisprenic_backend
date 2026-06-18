@@ -3,6 +3,7 @@ using FluentValidation.Results;
 
 using Microsoft.EntityFrameworkCore;
 
+using Sisprenic.Api.Authorization;
 using Sisprenic.Api.Database;
 
 using Sisprenic.Api.Entities;
@@ -13,7 +14,7 @@ public static class CreateLoanEndpoint
 {
     public static void MapCreateLoan(this RouteGroupBuilder group)
     {
-        group.MapPost("/", Handle).RequireAuthorization("loans:create");
+        group.MapPost("/", Handle).RequireAuthorization(Permissions.Loans.Create);
     }
 
     private static async Task<IResult> Handle(

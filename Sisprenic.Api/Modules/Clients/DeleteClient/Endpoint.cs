@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
+using Sisprenic.Api.Authorization;
 using Sisprenic.Api.Database;
 using Sisprenic.Api.Entities;
 
@@ -9,7 +10,7 @@ public static class DeleteClientEndpoint
 {
     public static void MapDeleteClient(this RouteGroupBuilder group)
     {
-        group.MapDelete("/{id}", Handle).RequireAuthorization("clients:delete");
+        group.MapDelete("/{id}", Handle).RequireAuthorization(Permissions.Clients.Delete);
     }
 
     private static async Task<IResult> Handle(int id, SisprenicContext dbContext)

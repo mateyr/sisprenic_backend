@@ -2,6 +2,7 @@ using System.Security.Claims;
 
 using Microsoft.EntityFrameworkCore;
 
+using Sisprenic.Api.Authorization;
 using Sisprenic.Api.Database;
 using Sisprenic.Api.Entities;
 
@@ -22,7 +23,7 @@ public static class GetCurrentUserEndpoint
         string email = claimsPrincipal.FindFirstValue(ClaimTypes.Email)!;
 
         string[] permissions = claimsPrincipal.Claims
-            .Where(claim => claim.Type == "permission")
+            .Where(claim => claim.Type == Permissions.ClaimType)
             .Select(claim => claim.Value)
             .ToArray();
 

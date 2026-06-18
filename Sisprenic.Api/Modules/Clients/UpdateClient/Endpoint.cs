@@ -1,6 +1,7 @@
 using FluentValidation;
 using FluentValidation.Results;
 
+using Sisprenic.Api.Authorization;
 using Sisprenic.Api.Database;
 using Sisprenic.Api.Entities;
 
@@ -10,7 +11,7 @@ public static class UpdateClientEndpoint
 {
     public static void MapUpdateClient(this RouteGroupBuilder group)
     {
-        group.MapPatch("/{id}", Handle).RequireAuthorization("clients:update");
+        group.MapPatch("/{id}", Handle).RequireAuthorization(Permissions.Clients.Update);
     }
 
     private static async Task<IResult> Handle(

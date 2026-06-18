@@ -3,6 +3,7 @@ using FluentValidation.Results;
 
 using Microsoft.EntityFrameworkCore;
 
+using Sisprenic.Api.Authorization;
 using Sisprenic.Api.Database;
 
 using Sisprenic.Api.Entities;
@@ -13,7 +14,7 @@ public static class UpdateLoanEndpoint
 {
     public static void MapUpdateLoan(this RouteGroupBuilder group)
     {
-        group.MapPatch("/{id}", Handle).RequireAuthorization("loans:update");
+        group.MapPatch("/{id}", Handle).RequireAuthorization(Permissions.Loans.Update);
     }
 
     private static async Task<IResult> Handle(

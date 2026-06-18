@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 using Microsoft.EntityFrameworkCore;
 
+using Sisprenic.Api.Authorization;
 using Sisprenic.Api.Database;
 using Sisprenic.Api.Entities;
 
@@ -14,7 +15,7 @@ public static class GetLoanContractEndpoint
 {
     public static void MapGetLoanContract(this RouteGroupBuilder group)
     {
-        group.MapGet("/{id}/contract", Handle).RequireAuthorization("loans:read");
+        group.MapGet("/{id}/contract", Handle).RequireAuthorization(Permissions.Loans.Read);
     }
 
     private static async Task<IResult> Handle(

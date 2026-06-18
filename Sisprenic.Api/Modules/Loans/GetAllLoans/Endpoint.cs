@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
+using Sisprenic.Api.Authorization;
 using Sisprenic.Api.Database;
 
 using Sisprenic.Api.Entities;
@@ -11,7 +12,7 @@ public static class GetAllLoansEndpoint
 {
     public static void MapGetAllLoans(this RouteGroupBuilder group)
     {
-        group.MapGet("/", Handle).RequireAuthorization("loans:read");
+        group.MapGet("/", Handle).RequireAuthorization(Permissions.Loans.Read);
     }
 
     private static async Task<IResult> Handle(SisprenicContext dbContext)

@@ -3,13 +3,14 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
+using Sisprenic.Api.Authorization;
+
 namespace Sisprenic.Api.Database;
 
 public static class AdminSeeder
 {
     private const string AdminEmail = "admin@sisprenic.com";
     private const string AdminPassword = "Admin123*";
-    private const string PermissionClaimType = "permission";
 
     public static async Task SeedAsync(
         UserManager<IdentityUser> userManager,
@@ -59,13 +60,13 @@ public static class AdminSeeder
         IList<Claim> existingClaims = await userManager.GetClaimsAsync(admin);
 
         HashSet<string> existingPermissions = existingClaims
-            .Where(c => c.Type == PermissionClaimType)
+            .Where(c => c.Type == Permissions.ClaimType)
             .Select(c => c.Value)
             .ToHashSet();
 
         List<Claim> claims = menuClaims
             .Where(value => !existingPermissions.Contains(value))
-            .Select(value => new Claim(PermissionClaimType, value))
+            .Select(value => new Claim(Permissions.ClaimType, value))
             .ToList();
 
         if (claims.Count == 0)

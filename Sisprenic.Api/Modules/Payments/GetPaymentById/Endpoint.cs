@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
+using Sisprenic.Api.Authorization;
 using Sisprenic.Api.Database;
 
 using Sisprenic.Api.Modules.Payments.Shared;
@@ -10,7 +11,7 @@ public static class GetPaymentByIdEndpoint
 {
     public static void MapGetPaymentById(this RouteGroupBuilder group)
     {
-        group.MapGet("/{id}", Handle).RequireAuthorization("payments:read");
+        group.MapGet("/{id}", Handle).RequireAuthorization(Permissions.Payments.Read);
     }
 
     private static async Task<IResult> Handle(int id, SisprenicContext dbContext)

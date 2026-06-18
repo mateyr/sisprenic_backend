@@ -3,6 +3,7 @@ using FluentValidation.Results;
 
 using Microsoft.EntityFrameworkCore;
 
+using Sisprenic.Api.Authorization;
 using Sisprenic.Api.Database;
 
 using Sisprenic.Api.Common;
@@ -15,7 +16,7 @@ public static class CreatePaymentEndpoint
 {
     public static void MapCreatePayment(this RouteGroupBuilder group)
     {
-        group.MapPost("/", Handle).RequireAuthorization("payments:create");
+        group.MapPost("/", Handle).RequireAuthorization(Permissions.Payments.Create);
     }
 
     private static async Task<IResult> Handle(

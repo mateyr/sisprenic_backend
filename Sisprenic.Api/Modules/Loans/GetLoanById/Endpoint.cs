@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
+using Sisprenic.Api.Authorization;
 using Sisprenic.Api.Database;
 
 using Sisprenic.Api.Entities;
@@ -11,7 +12,7 @@ public static class GetLoanByIdEndpoint
 {
     public static void MapGetLoanById(this RouteGroupBuilder group)
     {
-        group.MapGet("/{id}", Handle).RequireAuthorization("loans:read");
+        group.MapGet("/{id}", Handle).RequireAuthorization(Permissions.Loans.Read);
     }
 
     private static async Task<IResult> Handle(int id, SisprenicContext dbContext)

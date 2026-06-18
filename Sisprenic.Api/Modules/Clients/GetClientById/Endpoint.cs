@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
+using Sisprenic.Api.Authorization;
 using Sisprenic.Api.Database;
 
 namespace Sisprenic.Api.Modules.Clients.GetClientById;
@@ -8,7 +9,7 @@ public static class GetClientByIdEndpoint
 {
     public static void MapGetClientById(this RouteGroupBuilder group)
     {
-        group.MapGet("/{id}", Handle).RequireAuthorization("clients:read");
+        group.MapGet("/{id}", Handle).RequireAuthorization(Permissions.Clients.Read);
     }
 
     private static async Task<IResult> Handle(int id, SisprenicContext dbContext)

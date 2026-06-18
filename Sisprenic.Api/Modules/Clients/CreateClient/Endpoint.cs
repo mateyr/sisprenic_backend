@@ -1,6 +1,7 @@
 using FluentValidation;
 using FluentValidation.Results;
 
+using Sisprenic.Api.Authorization;
 using Sisprenic.Api.Database;
 using Sisprenic.Api.Entities;
 
@@ -10,7 +11,7 @@ public static class CreateClientEndpoint
 {
     public static void MapCreateClient(this RouteGroupBuilder group)
     {
-        group.MapPost("/", Handle).RequireAuthorization("clients:create");
+        group.MapPost("/", Handle).RequireAuthorization(Permissions.Clients.Create);
     }
 
     private static async Task<IResult> Handle(
