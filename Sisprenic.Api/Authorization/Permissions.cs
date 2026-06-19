@@ -1,8 +1,17 @@
+using System.Reflection;
+
 namespace Sisprenic.Api.Authorization;
 
 public static class Permissions
 {
     public const string ClaimType = "permission";
+
+    public static readonly IReadOnlySet<string> All = typeof(Permissions)
+        .GetNestedTypes(BindingFlags.Public)
+        .SelectMany(nested => nested.GetFields(BindingFlags.Public | BindingFlags.Static))
+        .Where(field => field.IsLiteral && field.FieldType == typeof(string))
+        .Select(field => (string)field.GetRawConstantValue()!)
+        .ToHashSet();
 
     public static class Dashboard
     {
