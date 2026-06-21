@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Serilog;
 using Serilog.Events;
 
+using Sisprenic.Api.Common;
 using Sisprenic.Api.Database;
 using Sisprenic.Api.Extensions;
 
@@ -48,6 +49,9 @@ try
         .AddRoles<IdentityRole>()
         .AddEntityFrameworkStores<SisprenicContext>();
 
+    builder.Services.ConfigureHttpJsonOptions(options =>
+        options.SerializerOptions.Converters.Add(new OptionalJsonConverterFactory()));
+
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
 
@@ -63,7 +67,6 @@ try
                               });
     });
 
-    builder.Services.AddValidation();
     builder.Services.AddGlobalExceptionHandling();
 
     // Validators

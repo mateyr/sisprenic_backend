@@ -1,10 +1,12 @@
+using Sisprenic.Api.Common;
+
 namespace Sisprenic.Api.Modules.Clients.UpdateClient;
 
 public record UpdateClientRequest(
-    string? FirstName,
-    string? SecondName,
-    string? LastName,
-    string? SecondLastName,
-    string? Identification,
-    string? PhoneNumber
+    Optional<string> FirstName,
+    Optional<string> SecondName,
+    Optional<string> LastName,
+    Optional<string> SecondLastName,
+    Optional<string> Identification,
+    Optional<string> PhoneNumber
 );

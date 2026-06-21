@@ -32,12 +32,12 @@ public static class UpdateClientEndpoint
         if (client is null)
             return TypedResults.NotFound();
 
-        if (request.FirstName is not null)       client.FirstName = request.FirstName;
-        if (request.SecondName is not null)      client.SecondName = request.SecondName;
-        if (request.LastName is not null)        client.LastName = request.LastName;
-        if (request.SecondLastName is not null)  client.SecondLastName = request.SecondLastName;
-        if (request.Identification is not null)  client.Identification = request.Identification;
-        if (request.PhoneNumber is not null)     client.PhoneNumber = request.PhoneNumber;
+        if (request.FirstName.HasValue)       client.FirstName = request.FirstName.Value!;
+        if (request.SecondName.HasValue)      client.SecondName = request.SecondName.Value;
+        if (request.LastName.HasValue)        client.LastName = request.LastName.Value!;
+        if (request.SecondLastName.HasValue)  client.SecondLastName = request.SecondLastName.Value;
+        if (request.Identification.HasValue)  client.Identification = request.Identification.Value!;
+        if (request.PhoneNumber.HasValue)     client.PhoneNumber = request.PhoneNumber.Value!;
 
         await dbContext.SaveChangesAsync(cancellationToken);
 

@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 using Microsoft.EntityFrameworkCore;
 
 using Sisprenic.Api.Authorization;
@@ -19,11 +17,19 @@ public static class GetLoanContractEndpoint
     }
 
     private static async Task<IResult> Handle(
-        [Range(1, int.MaxValue)] int id,
+        int id,
         SisprenicContext dbContext,
         IReportRenderer reportRenderer,
         CancellationToken cancellationToken)
     {
+        if (id < 1)
+        {
+            return Results.ValidationProblem(new Dictionary<string, string[]>
+            {
+                ["id"] = ["El id debe ser mayor a 0."]
+            });
+        }
+
         Loan? loan = await dbContext.Loan
             .Include(l => l.Client)
             .AsNoTracking()
