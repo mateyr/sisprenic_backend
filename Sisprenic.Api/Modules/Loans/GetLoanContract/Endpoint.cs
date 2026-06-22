@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using Sisprenic.Api.Authorization;
+using Sisprenic.Api.Common;
 using Sisprenic.Api.Database;
 using Sisprenic.Api.Entities;
 
@@ -55,7 +56,7 @@ public static class GetLoanContractEndpoint
         return new LoanContractViewModel
         {
             ContractNumber = $"PR-{loan.Id:D6}",
-            IssueDate = DateOnly.FromDateTime(DateTime.UtcNow),
+            IssueDate = BusinessClock.Today(),
             Lender = new LenderInfo
             {
                 Name = "SISPRENIC"

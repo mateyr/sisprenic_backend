@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
+using Sisprenic.Api.Common;
 using Sisprenic.Api.Database;
 
 using Sisprenic.Api.Entities;
@@ -18,7 +19,7 @@ public static class LoanSummaryService
         SisprenicContext dbContext,
         CancellationToken cancellationToken = default)
     {
-        DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
+        DateOnly today = BusinessClock.Today();
 
         List<Payment> payments = await dbContext.Payment
             .AsNoTracking()

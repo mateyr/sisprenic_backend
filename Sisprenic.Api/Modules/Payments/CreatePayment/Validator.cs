@@ -1,5 +1,7 @@
 using FluentValidation;
 
+using Sisprenic.Api.Common;
+
 namespace Sisprenic.Api.Modules.Payments.CreatePayment;
 
 public class CreatePaymentValidator : AbstractValidator<CreatePaymentRequest>
@@ -11,7 +13,7 @@ public class CreatePaymentValidator : AbstractValidator<CreatePaymentRequest>
         RuleFor(x => x.Interest)
             .GreaterThanOrEqualTo(0).WithMessage("El interés no puede ser negativo.");
         RuleFor(x => x.PaymentDay)
-            .LessThanOrEqualTo(DateOnly.FromDateTime(DateTime.UtcNow)).WithMessage("La fecha de pago no puede ser posterior a la fecha actual.");
+            .LessThanOrEqualTo(BusinessClock.Today()).WithMessage("La fecha de pago no puede ser posterior a la fecha actual.");
         RuleFor(x => x.LoanId)
             .NotNull().WithMessage("El id del préstamo es obligatorio.")
             .GreaterThan(0).WithMessage("El id del préstamo debe ser un número positivo.");

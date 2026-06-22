@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using Sisprenic.Api.Authorization;
+using Sisprenic.Api.Common;
 using Sisprenic.Api.Database;
 
 using Sisprenic.Api.Entities;
@@ -27,7 +28,7 @@ public static class DeletePaymentEndpoint
 
         if (loan is not null && loan.Status == LoanStatus.Paid)
         {
-            DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
+            DateOnly today = BusinessClock.Today();
 
             List<Payment> remainingPayments = await dbContext.Payment
                 .AsNoTracking()
