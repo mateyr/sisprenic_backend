@@ -49,6 +49,7 @@ public static class Permissions
     public static class Users
     {
         public const string Read = "users:read";
+        public const string Create = "users:create";
     }
 
     public static class Roles

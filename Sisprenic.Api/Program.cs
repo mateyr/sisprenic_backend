@@ -49,6 +49,24 @@ try
         .AddRoles<IdentityRole>()
         .AddEntityFrameworkStores<SisprenicContext>();
 
+    // Default to the httpOnly application cookie instead of the bearer scheme.
+    builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme);
+
+    builder.Services.ConfigureApplicationCookie(options =>
+    {
+        // API, not a server-rendered app: return 401/403 instead of redirecting to login pages.
+        options.Events.OnRedirectToLogin = context =>
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            return Task.CompletedTask;
+        };
+        options.Events.OnRedirectToAccessDenied = context =>
+        {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            return Task.CompletedTask;
+        };
+    });
+
     builder.Services.ConfigureHttpJsonOptions(options =>
         options.SerializerOptions.Converters.Add(new OptionalJsonConverterFactory()));
 
@@ -82,8 +100,6 @@ try
 
     app.UseSerilogRequestLogging();
     app.UseGlobalExceptionHandling();
-
-    app.MapIdentityApi<IdentityUser>().WithTags("Authentication");
 
     // Map application endpoints
     app.MapEndpoints();

@@ -7,8 +7,7 @@ public static class LogoutEndpoint
     public static void MapLogout(this IEndpointRouteBuilder app)
     {
         app.MapPost("/logout", Handle)
-            .RequireAuthorization()
-            .WithTags("Authentication");
+            .RequireAuthorization();
     }
 
     private static async Task<IResult> Handle(SignInManager<IdentityUser> signInManager)
