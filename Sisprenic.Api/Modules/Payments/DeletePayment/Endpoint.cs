@@ -1,7 +1,4 @@
-using Microsoft.EntityFrameworkCore;
-
 using Sisprenic.Api.Authorization;
-using Sisprenic.Api.Common;
 using Sisprenic.Api.Database;
 
 using Sisprenic.Api.Entities;
@@ -28,34 +25,7 @@ public static class DeletePaymentEndpoint
 
         Loan? loan = await LoanLockService.LoadForUpdateAsync(dbContext, payment.LoanId, cancellationToken);
 
-        if (loan is not null && loan.Status == LoanStatus.Paid)
-        {
-            DateOnly today = BusinessClock.Today();
-
-            List<Payment> remainingPayments = await dbContext.Payment
-                .AsNoTracking()
-                .Where(p => p.LoanId == loan.Id
-                         && p.Id != id
-                         && p.PaymentDay >= loan.StartDate
-                         && p.PaymentDay <= today)
-                .ToListAsync(cancellationToken);
-
-            LoanSummaryDto summary = LoanSummaryService.Calculate(loan, remainingPayments, today);
-
-            bool hasOutstandingBalance =
-                summary.PrincipalCurrent > 0 ||
-                summary.InterestPending > 0 ||
-                summary.InterestThisPeriod > 0;
-
-            if (hasOutstandingBalance)
-            {
-                loan.Status = LoanStatus.Active;
-            }
-        }
-
-        dbContext.Payment.Remove(payment);
-
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await DeletePaymentHandler.Execute(loan, payment, dbContext, cancellationToken);
 
         await transaction.CommitAsync(cancellationToken);
 

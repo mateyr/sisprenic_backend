@@ -49,7 +49,7 @@ public static class CreatePaymentHandler
 
         LoanSummaryDto summary = LoanSummaryService.Calculate(loan, payments, request.PaymentDay);
 
-        decimal totalInterestOutstanding = summary.InterestPending + summary.InterestThisPeriod;
+        decimal totalInterestOutstanding = summary.InterestOutstanding;
 
         if (summary.PrincipalCurrent == 0 && totalInterestOutstanding == 0)
         {
@@ -97,12 +97,7 @@ public static class CreatePaymentHandler
         decimal remainingPrincipal = summary.PrincipalCurrent - principalApplied;
         decimal remainingInterest = totalInterestOutstanding - interestApplied;
 
-        bool isPaid = remainingPrincipal == 0 && remainingInterest == 0;
-
-        if (isPaid)
-        {
-            loan.Status = LoanStatus.Paid;
-        }
+        loan.Status = LoanStatusService.Resolve(remainingPrincipal, remainingInterest);
 
         dbContext.Payment.Add(payment);
 
