@@ -21,10 +21,12 @@ public static class DeletePaymentEndpoint
         SisprenicContext dbContext,
         CancellationToken cancellationToken)
     {
+        await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
+
         Payment? payment = await dbContext.Payment.FindAsync([id], cancellationToken);
         if (payment is null) return TypedResults.NotFound();
 
-        Loan? loan = await dbContext.Loan.FindAsync([payment.LoanId], cancellationToken);
+        Loan? loan = await LoanLockService.LoadForUpdateAsync(dbContext, payment.LoanId, cancellationToken);
 
         if (loan is not null && loan.Status == LoanStatus.Paid)
         {
@@ -54,6 +56,8 @@ public static class DeletePaymentEndpoint
         dbContext.Payment.Remove(payment);
 
         await dbContext.SaveChangesAsync(cancellationToken);
+
+        await transaction.CommitAsync(cancellationToken);
 
         return TypedResults.NoContent();
     }

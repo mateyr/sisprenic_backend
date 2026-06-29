@@ -8,6 +8,7 @@ using Sisprenic.Api.Database;
 
 using Sisprenic.Api.Common;
 using Sisprenic.Api.Entities;
+using Sisprenic.Api.Modules.Loans.Shared;
 using Sisprenic.Api.Modules.Payments.Shared;
 
 namespace Sisprenic.Api.Modules.Payments.CreatePayment;
@@ -32,7 +33,9 @@ public static class CreatePaymentEndpoint
             return Results.ValidationProblem(validationResult.ToDictionary());
         }
 
-        Loan? loan = await dbContext.Loan.FirstOrDefaultAsync(l => l.Id == request.LoanId, cancellationToken);
+        await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
+
+        Loan? loan = await LoanLockService.LoadForUpdateAsync(dbContext, request.LoanId!.Value, cancellationToken);
 
         if (loan is null)
         {
@@ -49,6 +52,8 @@ public static class CreatePaymentEndpoint
         {
             return Results.ValidationProblem(result.Errors!);
         }
+
+        await transaction.CommitAsync(cancellationToken);
 
         Payment created = result.Payment!;
 
