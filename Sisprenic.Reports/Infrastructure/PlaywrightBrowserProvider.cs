@@ -19,9 +19,8 @@ public sealed class PlaywrightBrowserProvider : IAsyncDisposable
         _logger = logger;
     }
 
-    // Warms up Chromium at startup so the first report request doesn't pay the launch cost.
-    public Task InitializeAsync() => EnsureBrowserAsync();
-
+    // Chromium is launched lazily on the first report request (and relaunched on demand
+    // if the process dies), so there is no startup cost or dependency on the browser.
     public async Task<IBrowser> GetBrowserAsync() => await EnsureBrowserAsync();
 
     private async Task<IBrowser> EnsureBrowserAsync()

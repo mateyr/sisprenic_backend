@@ -107,9 +107,6 @@ try
     await app.MigrateDbAsync();
     await app.SeedAdminAsync();
 
-    // Initializes Playwright and prepares Chromium for PDF generation at startup
-    await app.InitializeReportingAsync();
-
     // Configure the HTTP request pipeline.
     if (app.Environment.IsDevelopment())
     {

@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-using Serilog;
-
 using Sisprenic.Api.Database;
 
 using Sisprenic.Api.Modules.Auth;
@@ -10,8 +8,6 @@ using Sisprenic.Api.Modules.Clients;
 using Sisprenic.Api.Modules.Loans;
 using Sisprenic.Api.Modules.Payments;
 using Sisprenic.Api.Modules.Users;
-using Sisprenic.Reports.Extensions;
-using Sisprenic.Reports.Infrastructure;
 
 using Swashbuckle.AspNetCore.SwaggerUI;
 
@@ -55,21 +51,5 @@ public static class ApplicationBuilderExtensions
         app.MapLoansModule();
         app.MapPaymentsModule();
         app.MapAuthModule();
-    }
-
-    // Installs Chromium (if needed) and initializes Playwright browser for PDF rendering.
-    public static async Task InitializeReportingAsync(this WebApplication app)
-    {
-        int exitCode = ReportingBootstrapper.EnsureBrowserInstalled();
-
-        if (exitCode != 0)
-        {
-            throw new InvalidOperationException($"Playwright Chromium installation failed with exit code {exitCode}.");
-        }
-
-        var browserProvider = app.Services.GetRequiredService<PlaywrightBrowserProvider>();
-        await browserProvider.InitializeAsync();
-
-        Log.Information("Playwright: Chromium browser successfully installed and initialized.");
     }
 }
