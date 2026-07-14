@@ -17,26 +17,26 @@ public class UpdateLoanValidator : AbstractValidator<UpdateLoanRequest>
 
         When(x => x.Principal.HasValue, () =>
         {
-            RuleFor(x => x.Principal!.Value)
+            RuleFor(x => x.Principal.Value)
                 .GreaterThan(0).WithMessage("El capital debe ser mayor a cero.");
         });
 
         When(x => x.InterestRate.HasValue, () =>
         {
-            RuleFor(x => x.InterestRate!.Value)
+            RuleFor(x => x.InterestRate.Value)
                 .GreaterThanOrEqualTo(0).WithMessage("La tasa de interés no puede ser negativa.")
                 .LessThanOrEqualTo(100).WithMessage("La tasa de interés no puede superar el 100%.");
         });
 
         When(x => x.TermMonths.HasValue, () =>
         {
-            RuleFor(x => x.TermMonths!.Value)
+            RuleFor(x => x.TermMonths.Value)
                 .GreaterThan(0).WithMessage("El plazo debe ser al menos un mes.");
         });
 
         When(x => x.ClientId.HasValue, () =>
         {
-            RuleFor(x => x.ClientId!.Value)
+            RuleFor(x => x.ClientId.Value)
                 .GreaterThan(0).WithMessage("El id del cliente debe ser un número positivo.");
         });
     }
