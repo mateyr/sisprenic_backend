@@ -1,6 +1,4 @@
-using Sisprenic.Api.Entities;
-
-namespace Sisprenic.Api.Entities
+namespace Sisprenic.Domain.Entities
 {
     public class Client : ISoftDeletable
     {

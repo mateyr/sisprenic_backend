@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Sisprenic.Api\Sisprenic.Api.csproj" />
+    <ProjectReference Include="..\Sisprenic.Domain\Sisprenic.Domain.csproj" />
   </ItemGroup>
 
 </Project>

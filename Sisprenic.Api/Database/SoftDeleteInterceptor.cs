@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
-using Sisprenic.Api.Entities;
+using Sisprenic.Domain.Entities;
 
 namespace Sisprenic.Api.Database;
 

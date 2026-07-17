@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 using Sisprenic.Api.Database;
 
-using Sisprenic.Api.Entities;
+using Sisprenic.Domain.Entities;
 using Sisprenic.Api.Modules.Payments.CreatePayment;
 
 using Xunit;

@@ -1,5 +1,5 @@
 using Sisprenic.Api.Authorization;
-using Sisprenic.Api.Entities;
+using Sisprenic.Domain.Entities;
 
 namespace Sisprenic.Api.Database;
 

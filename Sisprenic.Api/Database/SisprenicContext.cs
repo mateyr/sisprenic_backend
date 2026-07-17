@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Sisprenic.Api.Configurations;
-using Sisprenic.Api.Entities;
+using Sisprenic.Domain.Entities;
 
 namespace Sisprenic.Api.Database
 {

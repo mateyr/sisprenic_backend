@@ -7,7 +7,7 @@ using Sisprenic.Api.Authorization;
 using Sisprenic.Api.Database;
 
 using Sisprenic.Api.Common;
-using Sisprenic.Api.Entities;
+using Sisprenic.Domain.Entities;
 using Sisprenic.Api.Modules.Loans.Shared;
 using Sisprenic.Api.Modules.Payments.Shared;
 

@@ -1,6 +1,6 @@
 using Xunit;
 
-using Sisprenic.Api.Entities;
+using Sisprenic.Domain.Entities;
 using Sisprenic.Api.Modules.Loans.Shared;
 
 namespace Sisprenic.UnitTests.Loans;

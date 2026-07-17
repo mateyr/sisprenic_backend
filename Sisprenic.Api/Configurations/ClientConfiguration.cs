@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Sisprenic.Api.Entities;
+using Sisprenic.Domain.Entities;
 
 namespace Sisprenic.Api.Configurations
 {

@@ -1,4 +1,4 @@
-namespace Sisprenic.Api.Entities;
+namespace Sisprenic.Domain.Entities;
 
 public enum LoanStatus
 {

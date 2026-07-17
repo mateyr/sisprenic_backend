@@ -30,6 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Sisprenic.Domain\Sisprenic.Domain.csproj" />
     <ProjectReference Include="..\Sisprenic.Reports\Sisprenic.Reports.csproj" />
   </ItemGroup>
 

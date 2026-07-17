@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Sisprenic.Api.Database;
 
 using Sisprenic.Api.Common;
-using Sisprenic.Api.Entities;
+using Sisprenic.Domain.Entities;
 using Sisprenic.Api.Modules.Loans.Shared;
 
 namespace Sisprenic.Api.Modules.Payments.CreatePayment;

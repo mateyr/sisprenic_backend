@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 using Sisprenic.Api.Authorization;
 using Sisprenic.Api.Database;
-using Sisprenic.Api.Entities;
+using Sisprenic.Domain.Entities;
 
 namespace Sisprenic.Api.Modules.Users.GetCurrentUser;
 

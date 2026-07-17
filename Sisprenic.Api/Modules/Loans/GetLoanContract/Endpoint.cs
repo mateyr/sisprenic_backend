@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Sisprenic.Api.Authorization;
 using Sisprenic.Api.Common;
 using Sisprenic.Api.Database;
-using Sisprenic.Api.Entities;
+using Sisprenic.Domain.Entities;
 
 using Sisprenic.Reports.Abstractions;
 using Sisprenic.Reports.Reports.LoanContract;

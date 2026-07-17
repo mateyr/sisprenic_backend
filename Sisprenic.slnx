@@ -3,5 +3,6 @@
     <Project Path="Sisprenic.UnitTests/Sisprenic.UnitTests.csproj" Id="e0a48c6a-ddd4-42ab-baf6-978746d76f74" />
   </Folder>
   <Project Path="Sisprenic.Api/Sisprenic.Api.csproj" />
+  <Project Path="Sisprenic.Domain/Sisprenic.Domain.csproj" />
   <Project Path="Sisprenic.Reports/Sisprenic.Reports.csproj" />
 </Solution>
