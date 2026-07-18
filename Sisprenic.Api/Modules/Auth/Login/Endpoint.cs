@@ -23,6 +23,7 @@ public static class LoginEndpoint
         LoginRequest login,
         IValidator<LoginRequest> validator,
         SignInManager<IdentityUser> signInManager,
+        ILogger<LoginRequest> logger,
         CancellationToken cancellationToken)
     {
         ValidationResult validationResult = await validator.ValidateAsync(login, cancellationToken);
@@ -39,7 +40,10 @@ public static class LoginEndpoint
 
         if (!result.Succeeded)
         {
-            return TypedResults.Problem(result.ToString(), statusCode: StatusCodes.Status401Unauthorized);
+            logger.LogWarning(
+                "Login failed for user {UserName}: {Result}", login.UserName, result);
+
+            return TypedResults.Problem("Invalid username or password.", statusCode: StatusCodes.Status401Unauthorized);
         }
 
         return TypedResults.Empty;
