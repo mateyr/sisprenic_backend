@@ -12,7 +12,7 @@ public static class GetLoanByIdEndpoint
 {
     public static void MapGetLoanById(this RouteGroupBuilder group)
     {
-        group.MapGet("/{id}", Handle).RequireAuthorization(Permissions.Loans.Read);
+        group.MapGet("/{id:int}", Handle).RequireAuthorization(Permissions.Loans.Read);
     }
 
     private static async Task<IResult> Handle(

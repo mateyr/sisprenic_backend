@@ -10,7 +10,7 @@ public static class DeletePaymentEndpoint
 {
     public static void MapDeletePayment(this RouteGroupBuilder group)
     {
-        group.MapDelete("/{id}", Handle).RequireAuthorization(Permissions.Payments.Delete);
+        group.MapDelete("/{id:int}", Handle).RequireAuthorization(Permissions.Payments.Delete);
     }
 
     private static async Task<IResult> Handle(

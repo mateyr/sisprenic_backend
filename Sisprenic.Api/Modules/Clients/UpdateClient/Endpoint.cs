@@ -11,7 +11,7 @@ public static class UpdateClientEndpoint
 {
     public static void MapUpdateClient(this RouteGroupBuilder group)
     {
-        group.MapPatch("/{id}", Handle).RequireAuthorization(Permissions.Clients.Update);
+        group.MapPatch("/{id:int}", Handle).RequireAuthorization(Permissions.Clients.Update);
     }
 
     private static async Task<IResult> Handle(

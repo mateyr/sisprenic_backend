@@ -10,7 +10,7 @@ public static class DeleteClientEndpoint
 {
     public static void MapDeleteClient(this RouteGroupBuilder group)
     {
-        group.MapDelete("/{id}", Handle).RequireAuthorization(Permissions.Clients.Delete);
+        group.MapDelete("/{id:int}", Handle).RequireAuthorization(Permissions.Clients.Delete);
     }
 
     private static async Task<IResult> Handle(

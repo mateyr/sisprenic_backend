@@ -9,7 +9,7 @@ public static class GetLoanPaymentsEndpoint
 {
     public static void MapGetLoanPayments(this RouteGroupBuilder group)
     {
-        group.MapGet("/{id}/payments", Handle).RequireAuthorization(Permissions.Loans.Read);
+        group.MapGet("/{id:int}/payments", Handle).RequireAuthorization(Permissions.Loans.Read);
     }
 
     private static async Task<IResult> Handle(

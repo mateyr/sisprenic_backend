@@ -11,7 +11,7 @@ public static class GetPaymentByIdEndpoint
 {
     public static void MapGetPaymentById(this RouteGroupBuilder group)
     {
-        group.MapGet("/{id}", Handle).RequireAuthorization(Permissions.Payments.Read);
+        group.MapGet("/{id:int}", Handle).RequireAuthorization(Permissions.Payments.Read);
     }
 
     private static async Task<IResult> Handle(

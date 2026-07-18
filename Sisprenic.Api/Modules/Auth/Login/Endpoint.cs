@@ -1,3 +1,6 @@
+using FluentValidation;
+using FluentValidation.Results;
+
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 
@@ -13,10 +16,19 @@ public static class LoginEndpoint
 
     // Mirrors MapIdentityApi's "/login", trimmed to what this system needs: an httpOnly
     // cookie sign-in only (no bearer tokens, no cookie/session query toggles, no 2FA).
-    private static async Task<Results<EmptyHttpResult, ProblemHttpResult>> Handle(
+    private static async Task<Results<EmptyHttpResult, ValidationProblem, ProblemHttpResult>> Handle(
         LoginRequest login,
-        SignInManager<IdentityUser> signInManager)
+        IValidator<LoginRequest> validator,
+        SignInManager<IdentityUser> signInManager,
+        CancellationToken cancellationToken)
     {
+        ValidationResult validationResult = await validator.ValidateAsync(login, cancellationToken);
+
+        if (!validationResult.IsValid)
+        {
+            return TypedResults.ValidationProblem(validationResult.ToDictionary());
+        }
+
         signInManager.AuthenticationScheme = IdentityConstants.ApplicationScheme;
 
         SignInResult result = await signInManager.PasswordSignInAsync(

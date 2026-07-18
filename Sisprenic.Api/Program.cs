@@ -11,6 +11,8 @@ using Sisprenic.Api.Database;
 using Sisprenic.Api.Extensions;
 
 using Sisprenic.Api.Authorization;
+using Sisprenic.Api.Modules.Auth.Login;
+using Sisprenic.Api.Modules.Auth.Register;
 using Sisprenic.Api.Modules.Clients.CreateClient;
 using Sisprenic.Api.Modules.Clients.UpdateClient;
 using Sisprenic.Api.Modules.Loans.CreateLoan;
@@ -93,6 +95,8 @@ try
     builder.Services.AddScoped<IValidator<UpdateClientRequest>, UpdateClientValidator>();
     builder.Services.AddScoped<IValidator<CreateLoanRequest>, CreateLoanValidator>();
     builder.Services.AddScoped<IValidator<UpdateLoanRequest>, UpdateLoanValidator>();
+    builder.Services.AddScoped<IValidator<LoginRequest>, LoginValidator>();
+    builder.Services.AddScoped<IValidator<RegisterRequest>, RegisterValidator>();
 
     builder.Services.AddReporting();
 

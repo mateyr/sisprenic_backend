@@ -14,7 +14,7 @@ public static class GetLoanContractEndpoint
 {
     public static void MapGetLoanContract(this RouteGroupBuilder group)
     {
-        group.MapGet("/{id}/contract", Handle).RequireAuthorization(Permissions.Loans.Read);
+        group.MapGet("/{id:int}/contract", Handle).RequireAuthorization(Permissions.Loans.Read);
     }
 
     private static async Task<IResult> Handle(
@@ -23,14 +23,6 @@ public static class GetLoanContractEndpoint
         IReportRenderer reportRenderer,
         CancellationToken cancellationToken)
     {
-        if (id < 1)
-        {
-            return Results.ValidationProblem(new Dictionary<string, string[]>
-            {
-                ["id"] = ["El id debe ser mayor a 0."]
-            });
-        }
-
         Loan? loan = await dbContext.Loan
             .Include(l => l.Client)
             .AsNoTracking()

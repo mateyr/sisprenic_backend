@@ -11,7 +11,7 @@ public static class DeleteLoanEndpoint
 {
     public static void MapDeleteLoan(this RouteGroupBuilder group)
     {
-        group.MapDelete("/{id}", Handle).RequireAuthorization(Permissions.Loans.Delete);
+        group.MapDelete("/{id:int}", Handle).RequireAuthorization(Permissions.Loans.Delete);
     }
 
     private static async Task<IResult> Handle(

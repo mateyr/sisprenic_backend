@@ -9,7 +9,7 @@ public static class GetClientByIdEndpoint
 {
     public static void MapGetClientById(this RouteGroupBuilder group)
     {
-        group.MapGet("/{id}", Handle).RequireAuthorization(Permissions.Clients.Read);
+        group.MapGet("/{id:int}", Handle).RequireAuthorization(Permissions.Clients.Read);
     }
 
     private static async Task<IResult> Handle(
