@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Sisprenic.Api.Authorization;
 using Sisprenic.Api.Common;
 using Sisprenic.Api.Database;
+using Sisprenic.Api.Extensions;
 using Sisprenic.Domain.Entities;
 
 using Sisprenic.Reports.Abstractions;
@@ -14,7 +15,9 @@ public static class GetLoanContractEndpoint
 {
     public static void MapGetLoanContract(this RouteGroupBuilder group)
     {
-        group.MapGet("/{id:int}/contract", Handle).RequireAuthorization(Permissions.Loans.Read);
+        group.MapGet("/{id:int}/contract", Handle)
+            .RequireAuthorization(Permissions.Loans.Read)
+            .RequireRateLimiting(RateLimitingExtensions.PdfPolicy);
     }
 
     private static async Task<IResult> Handle(

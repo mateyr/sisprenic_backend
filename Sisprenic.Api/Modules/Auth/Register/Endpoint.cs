@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 
 using Sisprenic.Api.Authorization;
+using Sisprenic.Api.Extensions;
 
 namespace Sisprenic.Api.Modules.Auth.Register;
 
@@ -13,7 +14,8 @@ public static class RegisterEndpoint
     public static void MapRegister(this IEndpointRouteBuilder app)
     {
         app.MapPost("/register", Handle)
-            .RequireAuthorization(Permissions.Users.Create);
+            .RequireAuthorization(Permissions.Users.Create)
+            .RequireRateLimiting(RateLimitingExtensions.AuthPolicy);
     }
 
     // Unlike MapIdentityApi's /register

@@ -103,6 +103,8 @@ try
     builder.Services.AddHealthChecks()
         .AddDbContextCheck<SisprenicContext>();
 
+    builder.Services.AddApiRateLimiting();
+
     var app = builder.Build();
 
     app.UseSerilogRequestLogging();
@@ -122,6 +124,8 @@ try
     }
 
     app.UseHttpsRedirection();
+
+    app.UseApiRateLimiting();
 
     app.UseCors("AllowOrigins");
 

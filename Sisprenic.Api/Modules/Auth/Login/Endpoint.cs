@@ -4,6 +4,8 @@ using FluentValidation.Results;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 
+using Sisprenic.Api.Extensions;
+
 namespace Sisprenic.Api.Modules.Auth.Login;
 
 public static class LoginEndpoint
@@ -11,7 +13,8 @@ public static class LoginEndpoint
     public static void MapLogin(this IEndpointRouteBuilder app)
     {
         app.MapPost("/login", Handle)
-            .AllowAnonymous();
+            .AllowAnonymous()
+            .RequireRateLimiting(RateLimitingExtensions.AuthPolicy);
     }
 
     // Mirrors MapIdentityApi's "/login", trimmed to what this system needs: an httpOnly
