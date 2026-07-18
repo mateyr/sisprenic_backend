@@ -40,6 +40,15 @@ public static class CreateClientEndpoint
         dbContext.Client.Add(client);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return TypedResults.Created($"/clients/{client.Id}", client);
+        CreateClientResponse response = new(
+            client.Id,
+            client.FirstName,
+            client.SecondName,
+            client.LastName,
+            client.SecondLastName,
+            client.Identification,
+            client.PhoneNumber);
+
+        return TypedResults.Created($"/clients/{client.Id}", response);
     }
 }

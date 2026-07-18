@@ -52,6 +52,16 @@ public static class CreateLoanEndpoint
 
         dbContext.Loan.Add(loan);
         await dbContext.SaveChangesAsync(cancellationToken);
-        return TypedResults.Created($"/loans/{loan.Id}", loan);
+
+        CreateLoanResponse response = new(
+            loan.Id,
+            loan.Principal,
+            loan.InterestRate,
+            loan.TermMonths,
+            loan.StartDate,
+            loan.ClientId,
+            loan.Status.ToDisplayName());
+
+        return TypedResults.Created($"/loans/{loan.Id}", response);
     }
 }
