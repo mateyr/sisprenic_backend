@@ -96,6 +96,9 @@ try
 
     builder.Services.AddReporting();
 
+    builder.Services.AddHealthChecks()
+        .AddDbContextCheck<SisprenicContext>();
+
     var app = builder.Build();
 
     app.UseSerilogRequestLogging();
@@ -103,6 +106,7 @@ try
 
     // Map application endpoints
     app.MapEndpoints();
+    app.MapHealthChecks("/health").AllowAnonymous();
 
     await app.MigrateDbAsync();
     await app.SeedAdminAsync();
