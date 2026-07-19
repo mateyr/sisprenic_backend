@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Sisprenic.Api.Authorization;
 using Sisprenic.Api.Database;
 
+using Sisprenic.Api.Modules.Loans.Shared;
 using Sisprenic.Domain.Entities;
 
 namespace Sisprenic.Api.Modules.Loans.UpdateLoan;
@@ -31,7 +32,9 @@ public static class UpdateLoanEndpoint
             return Results.ValidationProblem(validationResult.ToDictionary());
         }
 
-        Loan? loan = await dbContext.Loan.FindAsync([id], cancellationToken);
+        await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
+
+        Loan? loan = await LoanLockService.LoadForUpdateAsync(dbContext, id, cancellationToken);
         if (loan is null) return TypedResults.NotFound();
 
         bool hasPayments = await dbContext.Payment.AnyAsync(p => p.LoanId == id, cancellationToken);
@@ -68,6 +71,7 @@ public static class UpdateLoanEndpoint
         if (request.ClientId.HasValue)     loan.ClientId     = request.ClientId.Value;
 
         await dbContext.SaveChangesAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
         return TypedResults.NoContent();
     }
 }
