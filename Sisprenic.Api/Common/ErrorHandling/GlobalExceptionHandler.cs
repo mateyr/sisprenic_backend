@@ -66,20 +66,20 @@ public sealed class GlobalExceptionHandler(
                 "Solicitud inválida",
                 "La solicitud no pudo ser procesada."),
 
-            ArgumentException argumentException => (
+            ArgumentException => (
                 StatusCodes.Status400BadRequest,
                 "Solicitud inválida",
-                argumentException.Message),
+                "La solicitud contiene datos inválidos."),
 
             UnauthorizedAccessException => (
                 StatusCodes.Status403Forbidden,
                 "Prohibido",
                 "No tiene permisos para realizar esta acción."),
 
-            KeyNotFoundException keyNotFoundException => (
+            KeyNotFoundException => (
                 StatusCodes.Status404NotFound,
                 "No encontrado",
-                keyNotFoundException.Message),
+                "El recurso solicitado no fue encontrado."),
 
             DbUpdateConcurrencyException => (
                 StatusCodes.Status409Conflict,
