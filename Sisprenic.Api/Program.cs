@@ -47,7 +47,7 @@ try
     builder.Services.AddAuthorization()
             .AddSingleton<IAuthorizationPolicyProvider, AuthorizationPolicyProvider>();
 
-    builder.Services.AddIdentityApiEndpoints<IdentityUser>()
+    builder.Services.AddIdentityApiEndpoints<IdentityUser>(options => options.User.RequireUniqueEmail = true)
         .AddRoles<IdentityRole>()
         .AddEntityFrameworkStores<SisprenicContext>();
 
@@ -121,6 +121,10 @@ try
     if (app.Environment.IsDevelopment())
     {
         app.UseSwaggerWithUi();
+    }
+    else
+    {
+        app.UseHsts();
     }
 
     app.UseHttpsRedirection();
