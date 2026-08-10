@@ -27,10 +27,7 @@ namespace Sisprenic.Api.Database
             modelBuilder.Entity<IdentityUserLogin<string>>().ToTable("user_login");
 
             // Invoke Configurations
-            new ClientConfiguration().Configure(modelBuilder.Entity<Client>());
-            new MenuConfiguration().Configure(modelBuilder.Entity<Menu>());
-            new LoanConfiguration().Configure(modelBuilder.Entity<Loan>());
-            new PaymentConfiguration().Configure(modelBuilder.Entity<Payment>());
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(SisprenicContext).Assembly);
         }
     }
 }
