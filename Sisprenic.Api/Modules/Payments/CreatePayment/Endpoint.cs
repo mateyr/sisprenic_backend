@@ -33,42 +33,47 @@ public static class CreatePaymentEndpoint
             return Results.ValidationProblem(validationResult.ToDictionary());
         }
 
-        await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
+        var strategy = dbContext.Database.CreateExecutionStrategy();
 
-        Loan? loan = await LoanLockService.LoadForUpdateAsync(dbContext, request.LoanId!.Value, cancellationToken);
-
-        if (loan is null)
+        return await ExecutionStrategyExtensions.ExecuteAsync(strategy, async Task<IResult> () =>
         {
-            return Results.ValidationProblem(
-                new Dictionary<string, string[]>
-                {
-                    ["loanId"] = [$"No existe un préstamo con el id {request.LoanId}."]
-                });
-        }
+            await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
 
-        CreatePaymentResult result = await CreatePaymentHandler.Execute(loan, request, dbContext, cancellationToken);
+            Loan? loan = await LoanLockService.LoadForUpdateAsync(dbContext, request.LoanId!.Value, cancellationToken);
 
-        if (!result.IsSuccess)
-        {
-            return Results.ValidationProblem(result.Errors!);
-        }
+            if (loan is null)
+            {
+                return Results.ValidationProblem(
+                    new Dictionary<string, string[]>
+                    {
+                        ["loanId"] = [$"No existe un préstamo con el id {request.LoanId}."]
+                    });
+            }
 
-        await transaction.CommitAsync(cancellationToken);
+            CreatePaymentResult result = await CreatePaymentHandler.Execute(loan, request, dbContext, cancellationToken);
 
-        Payment created = result.Payment!;
+            if (!result.IsSuccess)
+            {
+                return Results.ValidationProblem(result.Errors!);
+            }
 
-        PaymentResponse data = new(
-            created.Id,
-            created.Principal,
-            created.Interest,
-            created.PaymentDay,
-            created.Note,
-            created.LoanId);
+            await transaction.CommitAsync(cancellationToken);
 
-        ApiResponse<PaymentResponse> body = new(
-            Data: data,
-            Messages: result.Messages);
+            Payment created = result.Payment!;
 
-        return TypedResults.Created($"/payments/{created.Id}", body);
+            PaymentResponse data = new(
+                created.Id,
+                created.Principal,
+                created.Interest,
+                created.PaymentDay,
+                created.Note,
+                created.LoanId);
+
+            ApiResponse<PaymentResponse> body = new(
+                Data: data,
+                Messages: result.Messages);
+
+            return TypedResults.Created($"/payments/{created.Id}", body);
+        });
     }
 }

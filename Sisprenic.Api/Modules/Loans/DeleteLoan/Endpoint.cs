@@ -20,24 +20,29 @@ public static class DeleteLoanEndpoint
         SisprenicContext dbContext,
         CancellationToken cancellationToken)
     {
-        await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
+        var strategy = dbContext.Database.CreateExecutionStrategy();
 
-        Loan? loan = await LoanLockService.LoadForUpdateAsync(dbContext, id, cancellationToken);
-        if (loan is null) return TypedResults.NotFound();
-
-        bool hasPayments = await dbContext.Payment.AnyAsync(p => p.LoanId == id, cancellationToken);
-        if (hasPayments)
+        return await ExecutionStrategyExtensions.ExecuteAsync(strategy, async Task<IResult> () =>
         {
-            return Results.ValidationProblem(
-                new Dictionary<string, string[]>
-                {
-                    ["payments"] = ["No se puede eliminar un préstamo que cuenta con pagos registrados."]
-                });
-        }
+            await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
 
-        dbContext.Loan.Remove(loan);
-        await dbContext.SaveChangesAsync(cancellationToken);
-        await transaction.CommitAsync(cancellationToken);
-        return TypedResults.NoContent();
+            Loan? loan = await LoanLockService.LoadForUpdateAsync(dbContext, id, cancellationToken);
+            if (loan is null) return TypedResults.NotFound();
+
+            bool hasPayments = await dbContext.Payment.AnyAsync(p => p.LoanId == id, cancellationToken);
+            if (hasPayments)
+            {
+                return Results.ValidationProblem(
+                    new Dictionary<string, string[]>
+                    {
+                        ["payments"] = ["No se puede eliminar un préstamo que cuenta con pagos registrados."]
+                    });
+            }
+
+            dbContext.Loan.Remove(loan);
+            await dbContext.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
+            return TypedResults.NoContent();
+        });
     }
 }

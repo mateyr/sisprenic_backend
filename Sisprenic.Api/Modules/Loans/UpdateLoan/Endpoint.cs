@@ -32,46 +32,51 @@ public static class UpdateLoanEndpoint
             return Results.ValidationProblem(validationResult.ToDictionary());
         }
 
-        await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
+        var strategy = dbContext.Database.CreateExecutionStrategy();
 
-        Loan? loan = await LoanLockService.LoadForUpdateAsync(dbContext, id, cancellationToken);
-        if (loan is null) return TypedResults.NotFound();
-
-        bool hasPayments = await dbContext.Payment.AnyAsync(p => p.LoanId == id, cancellationToken);
-
-        if (hasPayments)
+        return await ExecutionStrategyExtensions.ExecuteAsync(strategy, async Task<IResult> () =>
         {
-            bool tryingToChangeRestrictedFields =
-                request.Principal.HasValue ||
-                request.InterestRate.HasValue ||
-                request.TermMonths.HasValue ||
-                request.StartDate.HasValue;
+            await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
 
-            if (tryingToChangeRestrictedFields)
-                return Results.ValidationProblem(new Dictionary<string, string[]>
-                {
-                    ["Loan"] = ["No se puede modificar un préstamo que ya tiene pagos registrados. Solo está permitido cambiar el cliente."]
-                });
-        }
+            Loan? loan = await LoanLockService.LoadForUpdateAsync(dbContext, id, cancellationToken);
+            if (loan is null) return TypedResults.NotFound();
 
-        if (request.ClientId.HasValue && loan.ClientId != request.ClientId.Value)
-        {
-            bool clientExists = await dbContext.Client.AnyAsync(c => c.Id == request.ClientId.Value, cancellationToken);
-            if (!clientExists)
-                return Results.ValidationProblem(new Dictionary<string, string[]>
-                {
-                    ["ClientId"] = [$"No existe un cliente con el id {request.ClientId.Value}."]
-                });
-        }
+            bool hasPayments = await dbContext.Payment.AnyAsync(p => p.LoanId == id, cancellationToken);
 
-        if (request.Principal.HasValue)    loan.Principal    = request.Principal.Value;
-        if (request.InterestRate.HasValue) loan.InterestRate = request.InterestRate.Value;
-        if (request.TermMonths.HasValue)   loan.TermMonths   = request.TermMonths.Value;
-        if (request.StartDate.HasValue)    loan.StartDate    = request.StartDate.Value;
-        if (request.ClientId.HasValue)     loan.ClientId     = request.ClientId.Value;
+            if (hasPayments)
+            {
+                bool tryingToChangeRestrictedFields =
+                    request.Principal.HasValue ||
+                    request.InterestRate.HasValue ||
+                    request.TermMonths.HasValue ||
+                    request.StartDate.HasValue;
 
-        await dbContext.SaveChangesAsync(cancellationToken);
-        await transaction.CommitAsync(cancellationToken);
-        return TypedResults.NoContent();
+                if (tryingToChangeRestrictedFields)
+                    return Results.ValidationProblem(new Dictionary<string, string[]>
+                    {
+                        ["Loan"] = ["No se puede modificar un préstamo que ya tiene pagos registrados. Solo está permitido cambiar el cliente."]
+                    });
+            }
+
+            if (request.ClientId.HasValue && loan.ClientId != request.ClientId.Value)
+            {
+                bool clientExists = await dbContext.Client.AnyAsync(c => c.Id == request.ClientId.Value, cancellationToken);
+                if (!clientExists)
+                    return Results.ValidationProblem(new Dictionary<string, string[]>
+                    {
+                        ["ClientId"] = [$"No existe un cliente con el id {request.ClientId.Value}."]
+                    });
+            }
+
+            if (request.Principal.HasValue)    loan.Principal    = request.Principal.Value;
+            if (request.InterestRate.HasValue) loan.InterestRate = request.InterestRate.Value;
+            if (request.TermMonths.HasValue)   loan.TermMonths   = request.TermMonths.Value;
+            if (request.StartDate.HasValue)    loan.StartDate    = request.StartDate.Value;
+            if (request.ClientId.HasValue)     loan.ClientId     = request.ClientId.Value;
+
+            await dbContext.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
+            return TypedResults.NoContent();
+        });
     }
 }

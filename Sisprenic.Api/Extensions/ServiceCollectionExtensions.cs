@@ -14,7 +14,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<SoftDeleteInterceptor>();
 
         services.AddDbContext<SisprenicContext>((sp, options) =>
-            options.UseNpgsql(connString)
+            options.UseNpgsql(connString, npgsqlOptions => npgsqlOptions.EnableRetryOnFailure())
             .UseSnakeCaseNamingConvention()
             .AddInterceptors(sp.GetRequiredService<SoftDeleteInterceptor>())
             .UseSeeding((context, _) =>

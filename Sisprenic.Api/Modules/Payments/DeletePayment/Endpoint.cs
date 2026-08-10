@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 using Sisprenic.Api.Authorization;
 using Sisprenic.Api.Database;
 
@@ -18,17 +20,22 @@ public static class DeletePaymentEndpoint
         SisprenicContext dbContext,
         CancellationToken cancellationToken)
     {
-        await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
+        var strategy = dbContext.Database.CreateExecutionStrategy();
 
-        Payment? payment = await dbContext.Payment.FindAsync([id], cancellationToken);
-        if (payment is null) return TypedResults.NotFound();
+        return await ExecutionStrategyExtensions.ExecuteAsync(strategy, async Task<IResult> () =>
+        {
+            await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
 
-        Loan? loan = await LoanLockService.LoadForUpdateAsync(dbContext, payment.LoanId, cancellationToken);
+            Payment? payment = await dbContext.Payment.FindAsync([id], cancellationToken);
+            if (payment is null) return TypedResults.NotFound();
 
-        await DeletePaymentHandler.Execute(loan, payment, dbContext, cancellationToken);
+            Loan? loan = await LoanLockService.LoadForUpdateAsync(dbContext, payment.LoanId, cancellationToken);
 
-        await transaction.CommitAsync(cancellationToken);
+            await DeletePaymentHandler.Execute(loan, payment, dbContext, cancellationToken);
 
-        return TypedResults.NoContent();
+            await transaction.CommitAsync(cancellationToken);
+
+            return TypedResults.NoContent();
+        });
     }
 }
