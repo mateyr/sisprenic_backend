@@ -46,10 +46,12 @@ public static class ApplicationBuilderExtensions
 
     public static void MapEndpoints(this WebApplication app)
     {
-        app.MapUsersModule();
-        app.MapClientsModule();
-        app.MapLoansModule();
-        app.MapPaymentsModule();
-        app.MapAuthModule();
+        var api = app.MapGroup("/api");
+
+        api.MapUsersModule();
+        api.MapClientsModule();
+        api.MapLoansModule();
+        api.MapPaymentsModule();
+        api.MapAuthModule();
     }
 }
