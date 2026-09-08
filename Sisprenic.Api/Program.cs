@@ -1,6 +1,7 @@
 using FluentValidation;
 
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 
 using Serilog;
@@ -105,7 +106,16 @@ try
 
     builder.Services.AddApiRateLimiting();
 
+    builder.Services.Configure<ForwardedHeadersOptions>(options =>
+    {
+        options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+        options.KnownIPNetworks.Clear();
+        options.KnownProxies.Clear();
+    });
+
     var app = builder.Build();
+
+    app.UseForwardedHeaders();
 
     app.UseSerilogRequestLogging();
     app.UseGlobalExceptionHandling();
