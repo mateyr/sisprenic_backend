@@ -1,0 +1,49 @@
+# Local environment: API + PostgreSQL.
+#   docker compose up --build
+# API: http://localhost:8080  (Swagger at /, health at /health)
+#
+# Secrets come from your .NET user secrets (same as `dotnet run`), mounted read-only
+# into the container. Required keys (set with `dotnet user-secrets set`):
+#   AdminUser:Email
+#   AdminUser:Password
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Sisprenic.Api/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      # Development => user secrets are loaded and Swagger is enabled.
+      ASPNETCORE_ENVIRONMENT: Development
+      # Overrides the user-secrets connection string: inside the container the
+      # database host is the "db" service, not localhost.
+      ConnectionStrings__Sisprenic: Host=db;Port=5432;Database=sisprenic;Username=postgres;Password=postgres
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: postgres:17
+    environment:
+      # Local throwaway database only; production uses Railway's managed Postgres.
+      POSTGRES_DB: sisprenic
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d sisprenic"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  pgdata:

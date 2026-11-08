@@ -12,7 +12,7 @@ using Sisprenic.Api.Database;
 namespace Sisprenic.Api.Database.Migrations
 {
     [DbContext(typeof(SisprenicContext))]
-    [Migration("20260908015248_InitialCreate")]
+    [Migration("20261107214017_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

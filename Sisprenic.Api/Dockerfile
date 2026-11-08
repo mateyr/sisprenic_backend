@@ -1,30 +1,39 @@
-# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
+# Build context must be the solution root (sisprenic_backend/):
+#   docker build -f Sisprenic.Api/Dockerfile .
 
-# This stage is used when running from VS in fast mode (Default for Debug configuration)
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
-USER $APP_UID
-WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
-
-
-# This stage is used to build the service project
+# ---------- Build ----------
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+
+# Solution-level MSBuild files (TargetFramework + central package versions)
+# must be present before restore, or every csproj fails to resolve.
+COPY ["global.json", "Directory.Build.props", "Directory.Packages.props", "./"]
 COPY ["Sisprenic.Api/Sisprenic.Api.csproj", "Sisprenic.Api/"]
-RUN dotnet restore "./Sisprenic.Api/Sisprenic.Api.csproj"
+COPY ["Sisprenic.Domain/Sisprenic.Domain.csproj", "Sisprenic.Domain/"]
+COPY ["Sisprenic.Reports/Sisprenic.Reports.csproj", "Sisprenic.Reports/"]
+RUN dotnet restore "Sisprenic.Api/Sisprenic.Api.csproj" -r linux-x64
+
 COPY . .
-WORKDIR "/src/Sisprenic.Api"
-RUN dotnet build "./Sisprenic.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet publish "Sisprenic.Api/Sisprenic.Api.csproj" \
+    -c $BUILD_CONFIGURATION -r linux-x64 --self-contained false --no-restore \
+    -o /app/publish /p:UseAppHost=false
 
-# This stage is used to publish the service project to be copied to the final stage
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Sisprenic.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-
-# This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
-FROM base AS final
+# ---------- Runtime ----------
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Sisprenic.Api.dll"]
+
+# Sisprenic.Reports launches Chromium in-process for PDF rendering.
+# Install it with the Playwright driver bundled in the publish output, so the
+# browser version always matches the Microsoft.Playwright NuGet version.
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+COPY --from=build /app/publish .
+RUN ./.playwright/node/linux-x64/node ./.playwright/package/cli.js install --with-deps chromium \
+    && rm -rf /var/lib/apt/lists/* \
+    && chmod -R a+rx /ms-playwright
+
+USER $APP_UID
+EXPOSE 8080
+
+# Railway injects PORT; default to 8080 locally.
+ENTRYPOINT ["sh", "-c", "ASPNETCORE_URLS=http://+:${PORT:-8080} exec dotnet Sisprenic.Api.dll"]

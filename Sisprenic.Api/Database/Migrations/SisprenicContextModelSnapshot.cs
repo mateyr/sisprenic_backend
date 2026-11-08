@@ -8,7 +8,7 @@ using Sisprenic.Api.Database;
 
 #nullable disable
 
-namespace sisprenic.Database.Migrations
+namespace Sisprenic.Api.Database.Migrations
 {
     [DbContext(typeof(SisprenicContext))]
     partial class SisprenicContextModelSnapshot : ModelSnapshot

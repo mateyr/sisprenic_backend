@@ -63,10 +63,10 @@ public static class AdminSeeder
             .Select(m => m.RequiredClaim!)
             .ToListAsync(cancellationToken);
 
-        // Permissions the admin must have that are not tied to a menu item (e.g. registering
-        // new users), so the admin can bootstrap accounts from startup.
-        HashSet<string> desiredPermissions = menuClaims.ToHashSet();
-        desiredPermissions.Add(Permissions.Users.Create);
+        // The admin gets every defined permission (create/update/delete included, not only
+        // the menu's read claims), plus any menu claim not declared in Permissions.
+        HashSet<string> desiredPermissions = Permissions.All.ToHashSet();
+        desiredPermissions.UnionWith(menuClaims);
 
         IList<Claim> existingClaims = await userManager.GetClaimsAsync(admin);
 
